@@ -1,15 +1,14 @@
 package org.mousebomb.classLoader 
 {
-	import flash.events.ProgressEvent;
-
-	import org.mousebomb.classLoader.IClassLoader;
-
 	import flash.display.Loader;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
+	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
-	import flash.net.URLRequest;	
+	import flash.net.URLRequest;
+	import flash.system.ApplicationDomain;
+	import flash.system.LoaderContext;
 
 	[Exclude(name="dispatchEvent", kind="method")]
 
@@ -21,6 +20,7 @@ package org.mousebomb.classLoader
 
 	/**
 	 * 运行时类库加载
+	 * 用于获得外部类，但保存在自己的子域中
 	 * 每个实例只能加载一次,不支持重复使用
 	 * @author Mousebomb
 	 * @date 2009-8-4
@@ -39,9 +39,24 @@ package org.mousebomb.classLoader
 			//trace("ClassLoader");
 		}
 
-		public function loadFile(url : String) : void
+		/**
+		 * @param url 提供类定义的swf文件
+		 * @param rsl 是否为运行时共享，默认false，如果为true，则在加载完成后所有需要用的地方可直接使用类定义而不必要用getClass
+		 */
+		public function loadFile(url : String,rsl : Boolean = false) : void
 		{
-			_loader.load(new URLRequest(url));
+			var context : LoaderContext;
+			if(rsl)
+			{
+				//子级和父级完全定义共享，但先到先得
+				context = new LoaderContext(false, ApplicationDomain.currentDomain);
+			}
+			else
+			{
+				//子级可用父级类定义，父级用子级的需要getClass
+				context = new LoaderContext(false, null);
+			}
+			_loader.load(new URLRequest(url), context);
 			_isFree = false;
 			_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadCompH);
 			_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIoErrorH);
@@ -73,6 +88,11 @@ package org.mousebomb.classLoader
 			//兼容旧版			dispatchEvent(new Event(LOAD_COMPLETE));
 		}
 
+		/**
+		 * 获得加载的外部类定义
+		 *  note1.只在加载完成后可用
+		 *  note2.如果是rsl，则可直接获得类定义
+		 */
 		public function getClass(name : String) : Class
 		{
 			return _loader.contentLoaderInfo.applicationDomain.getDefinition(name) as Class;

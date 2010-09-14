@@ -12,6 +12,7 @@ package org.mousebomb.framework
 	 * @author Mousebomb
 	 * @version 1.0
 	 * @updated 08-五月-2010 13:57:37
+	 * @updated 2010年9月14日 20:10:54 改成了默认为rsl模式，加载完成后 外部可直接使用类定义
 	 */
 	[Event(name="RSL_STARTLOAD", type="org.mousebomb.events.RSLEvent")]
 	[Event(name="RSL_NEXT", type="org.mousebomb.events.RSLEvent")]
@@ -125,7 +126,7 @@ package org.mousebomb.framework
 				//传出加载的内容
 				var e : RSLEvent = new RSLEvent(RSLEvent.RSL_NEXT, rslItem['name']);
 				dispatchEvent(e);
-				(rslItem['loader'] as ClassLoader).loadFile(rslItem['url']);
+				(rslItem['loader'] as ClassLoader).loadFile(rslItem['url'],true);
 				(rslItem['loader'] as ClassLoader).addEventListener(ProgressEvent.PROGRESS, onRslProgress);
 			}
 			else
