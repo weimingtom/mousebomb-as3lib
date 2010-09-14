@@ -16,7 +16,6 @@ package org.mousebomb.utils
 		 */
 		public static function bmd2ByteArray(bmd : BitmapData) : ByteArray
 		{
-			TimerCounter.startTask("bmd2ByteArray");
 			var wid : int = bmd.width;
 			var hei : int = bmd.height;
 			var tran : Boolean = bmd.transparent;
@@ -26,7 +25,6 @@ package org.mousebomb.utils
 			ending.writeInt(hei);
 			ending.writeBoolean(tran);
 			ending.writeBytes(bmd.getPixels(bmd.rect));
-			TimerCounter.endTask("bmd2ByteArray");
 			return ending;
 		}
 
