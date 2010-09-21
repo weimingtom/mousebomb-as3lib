@@ -113,6 +113,7 @@ package org.mousebomb.bmpdisplay
 			bmd_pool::bornFromPool = true;
 		}
 
+		//从1开始
 		private function showFrame(frame : int ) : void
 		{
 			//相同则忽视
@@ -125,10 +126,10 @@ package org.mousebomb.bmpdisplay
 				trace("frame's Bmd is Null : frame" + frame);
 			}
 			//DEBUG 2010年8月25日 13:20:35
-//			if(name=="m")
-//			{
-//				trace(frame, _bounds);
-//			}
+			//			if(name=="m")
+			//			{
+			//				trace(frame, _bounds);
+			//			}
 			onShowFrame(frame);
 		}
 
@@ -214,6 +215,15 @@ package org.mousebomb.bmpdisplay
 		}
 
 		/**
+		 * 直接显示某帧，并停止播放
+		 */
+		public function gotoAndStop(frame : int) : void
+		{
+			showFrame(frame);
+			_paused = true;
+		}
+
+		/**
 		 * 清除资源
 		 * 若有父级，则自动移除
 		 */
@@ -261,8 +271,10 @@ package org.mousebomb.bmpdisplay
 
 		public function get totalFrames() : int
 		{
-			//因为_frame[0]是空的
-			return _frame.length - 1;
+			////2010年9月17日 16:51:38 貌似后来改过后0不为空
+			//			//因为_frame[0]是空的 
+			//			return _frame.length - 1;
+			return _frame.length;
 		}
 
 		public function get fps() : int
