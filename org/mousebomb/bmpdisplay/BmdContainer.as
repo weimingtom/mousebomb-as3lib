@@ -1,5 +1,7 @@
 package org.mousebomb.bmpdisplay 
 {
+	import org.mousebomb.utils.TimerCounter;
+
 	import flash.display.BitmapData;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -13,6 +15,8 @@ package org.mousebomb.bmpdisplay
 	public class BmdContainer extends BmdObject 
 	{
 		private var _childrenList : Array = [];
+		//联合体
+		protected var _combined : Boolean = false;
 
 		public function BmdContainer()
 		{
@@ -22,6 +26,7 @@ package org.mousebomb.bmpdisplay
 		{
 			return _childrenList.length;
 		}
+
 		/**
 		 * 设置舞台引用
 		 * 此时即ADD_TO_STAGE
@@ -82,6 +87,10 @@ package org.mousebomb.bmpdisplay
 			return _childrenList[index];
 		}
 
+		/**
+		 * 移除的时候会自动去除child的所有监听
+		 * 所以若有需要，高层需要重新加入监听
+		 */
 		public function removeChild(child : BmdObject) : void
 		{
 			//从舞台移除会同时移除监听
@@ -97,6 +106,8 @@ package org.mousebomb.bmpdisplay
 		public function removeChildAt(index : int) : void
 		{
 			var child : BmdObject = getChildAt(index);
+			//从舞台移除会同时移除监听
+			child.removeAllListener();
 			child.setParent(null);			child.setStage(null);
 			_childrenList.splice(index, 1);
 			callReRender();
@@ -184,12 +195,55 @@ package org.mousebomb.bmpdisplay
 		internal override function  validateRectWhenMove(xAdd : Number,yAdd : Number) : void
 		{
 			super.validateRectWhenMove(xAdd, yAdd);
-			//对子级调用
+			//联合体无需检查子级
+			if(_combined) 
+			{
+				//遍历子级直接设置成我的display
+				foreachLevelChild(function(c : BmdObject):void
+				{
+					c.display = display;
+				});
+			}
+			else
+			{
+				//对子级调用 遍历检测
+				for(var i : int = numChildren - 1;i >= 0;--i)
+				{
+					var child : BmdObject = getChildAt(i);
+					child.validateRectWhenMove(xAdd, yAdd);
+				}
+			}
+		}
+
+		/**
+		 * 遍历所有子级执行
+		 */
+		internal function foreachLevelChild(func : Function) : void
+		{
 			for(var i : int = numChildren - 1;i >= 0;--i)
 			{
 				var child : BmdObject = getChildAt(i);
-				child.validateRectWhenMove(xAdd, yAdd);
+				func(child);
+				if(child is BmdContainer)
+				{
+					(child as BmdContainer).foreachLevelChild(func);
+				}
 			}
+		}
+
+		public function get combined() : Boolean
+		{
+			return _combined;
+		}
+
+		/**
+		 * 联合体
+		 * 如果为true，则在移动和大小变化时只检查当前级的为准，只要当前级在视口内，就渲染当前级和所有子级。
+		 * false,默认值，检查所有子级，分开渲染
+		 */
+		public function set combined(v : Boolean) : void
+		{
+			_combined = v;
 		}
 	}
 }

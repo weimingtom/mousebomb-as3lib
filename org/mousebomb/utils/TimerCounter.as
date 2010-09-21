@@ -9,7 +9,7 @@ package org.mousebomb.utils
 	public class TimerCounter extends Object 
 	{
 
-		//任务
+		//任务单次开始执行的时间
 		private static var _tasks : Object = {};
 
 		/**
@@ -23,11 +23,11 @@ package org.mousebomb.utils
 		/**
 		 * 结束任务计时，返回执行时间
 		 */
-		public static function endTask(name : String) : int
+		public static function endTask(name : String) : void
 		{
-			var time : int = getTimer() - _tasks[name] ;
-			trace("Task " + name + " used :" + time + " ms");
-			return time;
+			//一次执行耗时
+			var onceTime : int = getTimer() - _tasks[name] ;
+			trace("Task " + name + " used :" + onceTime + " ms");
 		}
 	}
 }
