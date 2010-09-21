@@ -115,7 +115,7 @@ package org.mousebomb.bmpdisplay
 //								trace(sourceRect, destPoint);
 //							}
 						}
-						child.renderRect = new Rectangle(_curXOffset, _curYOffset, child.width, child.height);
+						child.renderRect = new Rectangle(destPoint.x, destPoint.y, child.width, child.height);
 					}
 					if(child is BmdContainer)
 					{
