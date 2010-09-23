@@ -1,9 +1,12 @@
 package org.mousebomb.bmpdisplay 
 {
 	import flash.display.BitmapData;
+	import flash.display.Shape;
+	import flash.events.Event;
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.utils.Dictionary;
 
 	/**
 	 * 类似DisplayObject
@@ -54,8 +57,38 @@ package org.mousebomb.bmpdisplay
 		//全局坐标,第一次加入舞台的时候设置
 		protected var _globalY : Number = 0;
 
+		/** @private 用来做enterframe **/
+		protected static var shape : Shape;
+		//需要调度的列表
+		protected static var enterFrameList : Dictionary = new Dictionary(true);
+		
+		staticInit();
+
+		private static function staticInit() : void 
+		{
+			//初始化逐帧监听
+			(shape = new Shape()).addEventListener(Event.ENTER_FRAME, onEnterFrame);
+		}
+
+		/**
+		 * 抵达一个处理周期
+		 */
+		private static function onEnterFrame(event : Event) : void 
+		{
+			for ( var obj : * in enterFrameList)
+			{
+				//处理需要处理的rect验证
+				var bmdObj : BmdObject = obj as BmdObject;
+				if(bmdObj.needValidate)
+				{
+					bmdObj.realValidateRect();
+				}
+			}
+		}
+
 		public function BmdObject()
 		{
+			enterFrameList[this] = true;
 		}
 
 		/**
@@ -269,6 +302,8 @@ package org.mousebomb.bmpdisplay
 				//只是释放监听
 				removeAllListener();
 			}
+			//删除需要enterframe处理的列表
+			delete enterFrameList[this];
 		}
 
 		/**
@@ -500,29 +535,46 @@ package org.mousebomb.bmpdisplay
 		//维护我的全局rect
 		internal function validateRectWhenResize() : void
 		{
+			needValidate = true;
 			//局部绘制(3)
-			//resize 及bounds变化，需要更新_globalRect ，此时变化的是bounds.*
-			_globalRect.x = _globalX + bounds.x;
-			_globalRect.y = _globalY + bounds.y;
-			//
-			_globalRect.width = _bounds.width;			_globalRect.height = _bounds.height;
-			//如果是否在视口内显示发生变化，要重绘
-			//如果本来就在视口内直接要重绘
-			if(validateDisplay() || display)
-			{			
-				callReRender();
-			}
+			//2010年9月23日 18:40:51 改到realValidateRect去了
+//			//resize 及bounds变化，需要更新_globalRect ，此时变化的是bounds.*
+//			_globalRect.x = _globalX + bounds.x;
+//			_globalRect.y = _globalY + bounds.y;
+//			//
+//			_globalRect.width = _bounds.width;//			_globalRect.height = _bounds.height;
+//			//如果是否在视口内显示发生变化，要重绘
+//			//如果本来就在视口内直接要重绘
+//			if(validateDisplay() || display)
+//			{			
+//				callReRender();
+//			}
 		}
-
+		
 		internal function validateRectWhenMove(xAdd : Number,yAdd : Number) : void
 		{
 			//局部绘制(4)
 			//对全局坐标进行更新
 			_globalX += xAdd;
-			_globalY += yAdd;
+			_globalY += yAdd; 
+			needValidate = true;
+		}
+
+		//移动之后的总
+		public var needValidate : Boolean = false;
+
+		//在周期实际验证
+		internal function realValidateRect() : void
+		{
+			//
+			needValidate = false;
 			//对局部绘制的范围进行调整
+			//resize需要：此时bounds可能变化了 ; move需要：此时的_globalX,_globalY可能变化了
 			_globalRect.x = _globalX + bounds.x;
 			_globalRect.y = _globalY + bounds.y;
+			//resize需要 resize 及bounds变化，需要更新_globalRect ，此时变化的是bounds.*
+			_globalRect.width = _bounds.width;
+			_globalRect.height = _bounds.height;
 			//如果是否在视口内显示发生变化，要重绘
 			//如果本来就在视口内直接要重绘
 			if(validateDisplay() || display)
