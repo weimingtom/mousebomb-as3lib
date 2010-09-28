@@ -559,9 +559,6 @@ package org.mousebomb.bmpdisplay
 			//对全局坐标进行更新
 			_globalX += xAdd;
 			_globalY += yAdd;
-			if(name=="a"){
-				trace(yAdd, _globalY);
-			}
 			needValidate = true;
 		}
 
