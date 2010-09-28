@@ -1,7 +1,5 @@
 package org.mousebomb.bmpdisplay 
 {
-	import org.mousebomb.utils.TimerCounter;
-
 	import flash.display.BitmapData;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -25,6 +23,22 @@ package org.mousebomb.bmpdisplay
 		public function get numChildren() : int
 		{
 			return _childrenList.length;
+		}
+
+		/**
+		 * 设置父级（或更换父级）\
+		 * 此时即ADDED
+		 */
+		override internal function setParent(parent : BmdContainer) : void 
+		{
+			//对本级的坐标进行全局换算
+			super.setParent(parent);
+			//让子级坐标全局换算
+			foreachLevelChild(function(bo:BmdObject):void
+			{
+				bo._globalX += _globalX;
+				bo._globalY += _globalY;
+			});
 		}
 
 		/**
