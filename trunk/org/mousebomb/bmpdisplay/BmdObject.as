@@ -53,9 +53,9 @@ package org.mousebomb.bmpdisplay
 		private var _renderRect : Rectangle = new Rectangle();
 		//我的全局rect 即将渲染到的 ， 用于渲染/重绘时判定是否需要绘制		protected var _globalRect : Rectangle = new Rectangle();
 		//全局坐标,内部维护
-		protected var _globalX : Number = 0;
+		internal var _globalX : Number = 0;
 		//全局坐标,第一次加入舞台的时候设置
-		protected var _globalY : Number = 0;
+		internal var _globalY : Number = 0;
 
 		/** @private 用来做enterframe **/
 		protected static var shape : Shape;
@@ -88,6 +88,7 @@ package org.mousebomb.bmpdisplay
 
 		public function BmdObject()
 		{
+			//bmdObject几乎每个在每帧都要处理，所以构造函数中直接加入
 			enterFrameList[this] = true;
 		}
 
@@ -147,6 +148,7 @@ package org.mousebomb.bmpdisplay
 
 		public function set y(v : Number) : void
 		{
+			if(v == _y){ return;}
 			var added : Number = v - _y;
 			_y = v;
 			//重设位置后
@@ -161,6 +163,7 @@ package org.mousebomb.bmpdisplay
 
 		public function set x(v : Number) : void
 		{
+			if(v == _x){return;}
 			var added : Number = v - _x;
 			_x = v;
 			validateRectWhenMove(added, 0);
@@ -356,8 +359,7 @@ package org.mousebomb.bmpdisplay
 			//
 			var rootRect : Rectangle = bmpStage.bitmapData.rect;
 			//这里有一处可能未来需要改动：精度不够。现在是不计算子级所带来的大小影响的
-			//TODO bounds 有影响
-			//			trace('_globalRect: ' + (_globalRect));
+			//bounds 有影响
 			var inViewPort : Boolean = rootRect.intersects(_globalRect);
 			//rootRect.containsPoint(_globalRect.topLeft) || rootRect.containsPoint(_globalRect.bottomRight) || rootRect.contains(_globalRect.left, _globalRect.bottom) || rootRect.contains(_globalRect.right, _globalRect.top);
 			//rootRect.containsRect(_globalRect);
@@ -556,7 +558,7 @@ package org.mousebomb.bmpdisplay
 			//局部绘制(4)
 			//对全局坐标进行更新
 			_globalX += xAdd;
-			_globalY += yAdd; 
+			_globalY += yAdd;
 			needValidate = true;
 		}
 

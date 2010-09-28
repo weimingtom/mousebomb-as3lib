@@ -14,7 +14,7 @@ package org.mousebomb.map
 	{
 		private var _astar : AStar;
 		//通断数据二维数组
-		private var _model : MapTileModel ;
+		protected var _model : MapTileModel ;
 		//寻路的单位格子大小
 		private var _tileSize : Number = 10;
 
@@ -22,6 +22,15 @@ package org.mousebomb.map
 		{
 			_model = new MapTileModel();
 			_astar = new AStar(_model);
+		}
+		
+		/**
+		 * arr[x][y]=1|0
+		 * 是一个描述地图上每个象素是通路1还是障碍0的数组
+		 */
+		public function setBlock(x:int,y:int,v:int):void
+		{
+			_model.map[x][y] = v;
 		}
 
 		/**
