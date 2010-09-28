@@ -31,13 +31,24 @@ package org.mousebomb.bmpdisplay
 		 */
 		override internal function setParent(parent : BmdContainer) : void 
 		{
-			//对本级的坐标进行全局换算
-			super.setParent(parent);
+			/*
+			 * 设置父级引用，
+			 * 同时要计算global坐标
+			 */
+			_parent = parent;
+			//坐标
+			if(needValidate)
+				realValidateRect();
+			var pos : Point = localToGlobal();
+			var globalXAdd : Number = pos.x - _globalX;
+			var globalYAdd : Number = pos.y - _globalY;
+			_globalX = pos.x;
+			_globalY = pos.y;
 			//让子级坐标全局换算
-			foreachLevelChild(function(bo:BmdObject):void
+			foreachLevelChild(function(bo : BmdObject):void
 			{
-				bo._globalX += _globalX;
-				bo._globalY += _globalY;
+				bo._globalX += globalXAdd;
+				bo._globalY += globalYAdd;
 			});
 		}
 

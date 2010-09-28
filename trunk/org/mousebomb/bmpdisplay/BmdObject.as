@@ -33,7 +33,7 @@ package org.mousebomb.bmpdisplay
 		private var _display : Boolean = false;
 		private var _name : String = "";
 		//父级引用
-		private var _parent : BmdContainer ;
+		protected var _parent : BmdContainer ;
 		/**
 		 * 加到Bmp舞台上的对象会有此引用
 		 */
@@ -559,6 +559,9 @@ package org.mousebomb.bmpdisplay
 			//对全局坐标进行更新
 			_globalX += xAdd;
 			_globalY += yAdd;
+			if(name=="a"){
+				trace(yAdd, _globalY);
+			}
 			needValidate = true;
 		}
 
