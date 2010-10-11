@@ -16,16 +16,16 @@ package org.mousebomb.display
 		/**
 		 * 由于SimpleButton不支持child 所以我用MovieClip做基类
 		 */
-		private const FRAME_NORMAL:uint=1;
-		private const FRAME_NORMAL_E:uint=10;
-		private const FRAME_OVER:uint = 11;
-		private const FRAME_OVER_E:uint = 20;
-		private const FRAME_OUT:uint = 21;
-		private const FRAME_OUT_E:uint = 30;
-		private const FRAME_PRESS:uint = 31;
-		private const FRAME_PRESS_E:uint = 40;
-		private const FRAME_RELEASE:uint = 41;
-		private const FRAME_RELEASE_E:uint = 50;
+		protected var FRAME_NORMAL:uint=1;
+		protected var FRAME_NORMAL_E:uint=10;
+		protected var FRAME_OVER:uint = 11;
+		protected var FRAME_OVER_E:uint = 20;
+		protected var FRAME_OUT:uint = 21;
+		protected var FRAME_OUT_E:uint = 30;
+		protected var FRAME_PRESS:uint = 31;
+		protected var FRAME_PRESS_E:uint = 40;
+		protected var FRAME_RELEASE:uint = 41;
+		protected var FRAME_RELEASE_E:uint = 50;
 		
 		public function ComplexButton():void
 		{

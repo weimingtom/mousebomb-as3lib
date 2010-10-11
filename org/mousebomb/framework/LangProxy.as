@@ -52,7 +52,7 @@ package org.mousebomb.framework
 			if(_langMap[name])
 				return _langMap[name];
 			else
-				return "#语言数据丢失 | Language data missing#";
+				return "#语言丢失" + name + "#";
 		}
 
 		/**
