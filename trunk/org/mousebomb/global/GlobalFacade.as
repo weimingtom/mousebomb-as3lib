@@ -1,8 +1,5 @@
 package org.mousebomb.global 
 {
-	import org.mousebomb.utils.Debug;
-
-	import flash.events.EventDispatcher;		
 
 	/**
 	 * 全局的门面
@@ -11,7 +8,7 @@ package org.mousebomb.global
 	 * @version 1.9.8.17
 	 * @author Mousebomb
 	 */
-	public class GlobalFacade extends EventDispatcher 
+	public class GlobalFacade  
 	{
 		//[name:[handler,...],...]
 		private static var listeners : Array = [];

@@ -1,5 +1,7 @@
 package org.mousebomb.map 
 {
+	import org.mousebomb.utils.TimerCounter;
+
 	import flash.events.EventDispatcher;
 	import flash.geom.Point;
 
@@ -23,14 +25,14 @@ package org.mousebomb.map
 			_model = new MapTileModel();
 			_astar = new AStar(_model);
 		}
-		
+
 		/**
 		 * arr[x][y]=1|0
 		 * 是一个描述地图上每个象素是通路1还是障碍0的数组
 		 */
-		public function setBlock(x:int,y:int,v:int):void
+		public function setBlock(x : int,y : int,v : Boolean) : void
 		{
-			_model.map[x][y] = v;
+			_model.map[x][y] = v?1:0;
 		}
 
 		/**
@@ -54,7 +56,9 @@ package org.mousebomb.map
 		public function getPath(start : Point,end : Point) : Array
 		{
 			//找到原始路径二维数组
+			TimerCounter.startTask("getPath");
 			var track : Array = _astar.find(start.x, start.y, end.x, end.y);
+			TimerCounter.endTask("getPath");
 			if(!track)
 			{
 				return null;
