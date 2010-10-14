@@ -1,6 +1,6 @@
 package org.mousebomb.bmpdisplay 
 {
-	import flash.display.Stage;
+	import flash.display.DisplayObjectContainer;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 
@@ -24,7 +24,7 @@ package org.mousebomb.bmpdisplay
 		 * 开始事件捕捉
 		 * 我要提供对象检索、监听舞台
 		 */
-		internal function initEvents(s : Stage) : void
+		internal function initEvents(s : DisplayObjectContainer) : void
 		{
 			s.addEventListener(MouseEvent.CLICK, onMouseClick);
 			s.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
@@ -35,7 +35,7 @@ package org.mousebomb.bmpdisplay
 		/**
 		 * 清除事件捕捉，释放舞台的监听
 		 */
-		internal function clearEvents(s : Stage) : void
+		internal function clearEvents(s : DisplayObjectContainer) : void
 		{
 			s.removeEventListener(MouseEvent.CLICK, onMouseClick);			s.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			//置空鼠标在的对象
