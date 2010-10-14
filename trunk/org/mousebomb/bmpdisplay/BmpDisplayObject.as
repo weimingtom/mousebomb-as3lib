@@ -1,5 +1,6 @@
 package org.mousebomb.bmpdisplay 
 {
+	import flash.display.DisplayObjectContainer;
 	import flash.display.Bitmap;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
@@ -32,6 +33,8 @@ package org.mousebomb.bmpdisplay
 		private var _render : RenderProcess;
 		//计算重绘范围，用于重绘
 		private var _rerenderRect : Rectangle = new Rectangle(0, 0, 0, 0);
+		//交互的监听承载者
+		private var _interactiveContainer : DisplayObjectContainer;
 
 		
 		/**
@@ -63,13 +66,13 @@ package org.mousebomb.bmpdisplay
 		//从舞台移除的时候解除捕捉
 		private function onLostStage(event : Event) : void
 		{
-			_eventCatcher.clearEvents(stage);
+			_eventCatcher.clearEvents(_interactiveContainer);
 		}
 
 		//加入舞台开始捕捉
 		private function onStage(event : Event) : void
 		{
-			_eventCatcher.initEvents(stage);
+			_eventCatcher.initEvents(_interactiveContainer);
 		}
 
 		/**
@@ -181,6 +184,20 @@ package org.mousebomb.bmpdisplay
 		bmd_render function get totalObjCount() : int
 		{
 			return _render.totalObjCount;
+		}
+		
+		//交互的监听承载者
+		public function get interactiveContainer() : DisplayObjectContainer
+		{
+			return _interactiveContainer;
+		}
+		/**
+		 * 交互的监听承载者 可以是stage，但很多情况下，不应该使用stage
+		 * 在添加到显示列表前必须设置
+		 */
+		public function set interactiveContainer(interactiveContainer : DisplayObjectContainer) : void
+		{
+			_interactiveContainer = interactiveContainer;
 		}
 	}
 }
