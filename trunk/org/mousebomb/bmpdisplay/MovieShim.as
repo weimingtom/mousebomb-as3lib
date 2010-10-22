@@ -309,7 +309,7 @@ package org.mousebomb.bmpdisplay
 			//记录当前播放的单元
 			_unitName = name_;
 			_playMode = PLAYMODE_UNITLOOP;
-			if(fps_) this.fps = fps_;		
+			if(fps_) this.fps = fps_;
 			_paused = false;
 			//记录当前播放单元的帧数
 			_curUnitTotalFrame = (_unitDefine[name_] as Array).length;
