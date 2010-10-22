@@ -217,7 +217,7 @@ package org.mousebomb.bmpdisplay
 			return shot;
 		}
 
-		internal override function  validateRectWhenMove(xAdd : Number,yAdd : Number) : void
+		internal override function  validateRectWhenMove(xAdd : int,yAdd : int) : void
 		{
 			super.validateRectWhenMove(xAdd, yAdd);
 			//联合体无需检查子级

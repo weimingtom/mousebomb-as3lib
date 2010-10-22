@@ -28,7 +28,7 @@ package org.mousebomb.bmpdisplay
 		//当前的bounds
 		protected var _bounds : Rectangle;
 
-		private var _x : Number = 0;		private var _y : Number = 0;
+		private var _x : int = 0;		private var _y : int = 0;
 		private var _rotation : int = 0;		private var _visible : Boolean = true;
 		private var _display : Boolean = false;
 		private var _name : String = "";
@@ -53,9 +53,9 @@ package org.mousebomb.bmpdisplay
 		private var _renderRect : Rectangle = new Rectangle();
 		//我的全局rect 即将渲染到的 ， 用于渲染/重绘时判定是否需要绘制		protected var _globalRect : Rectangle = new Rectangle();
 		//全局坐标,内部维护
-		internal var _globalX : Number = 0;
+		internal var _globalX : int = 0;
 		//全局坐标,第一次加入舞台的时候设置
-		internal var _globalY : Number = 0;
+		internal var _globalY : int = 0;
 
 		/** @private 用来做enterframe **/
 		protected static var shape : Shape;
@@ -141,30 +141,30 @@ package org.mousebomb.bmpdisplay
 			alpha = 1;
 		}
 
-		public function get y() : Number
+		public function get y() : int
 		{
 			return _y;
 		}
 
-		public function set y(v : Number) : void
+		public function set y(v : int) : void
 		{
 			if(v == _y){ return;}
-			var added : Number = v - _y;
+			var added : int = v - _y;
 			_y = v;
 			//重设位置后
 			//维护全局位置
 			validateRectWhenMove(0, added);
 		}
 
-		public function get x() : Number
+		public function get x() : int
 		{
 			return _x;
 		}
 
-		public function set x(v : Number) : void
+		public function set x(v : int) : void
 		{
 			if(v == _x){return;}
-			var added : Number = v - _x;
+			var added : int = v - _x;
 			_x = v;
 			validateRectWhenMove(added, 0);
 		}
@@ -553,7 +553,7 @@ package org.mousebomb.bmpdisplay
 //			}
 		}
 		
-		internal function validateRectWhenMove(xAdd : Number,yAdd : Number) : void
+		internal function validateRectWhenMove(xAdd : int,yAdd : int) : void
 		{
 			//局部绘制(4)
 			//对全局坐标进行更新
