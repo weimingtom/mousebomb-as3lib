@@ -5,6 +5,7 @@ package org.mousebomb.bmpdisplay
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
+	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 
@@ -48,13 +49,18 @@ package org.mousebomb.bmpdisplay
 		public static const IMAGE : String = "Image";		public static const ANIMATION : String = "Animation";
 		public static const MOVIESHIM : String = "MovieShim";
 
+		
+		//设置多颜色截取时代替颜色的mc名 默认为colorArea
+		public var colorArea : String = "colorArea";
+
 		/**
 		 * 注册一个资源
 		 * @param name 唯一名字
 		 * @param src 资源对象（Sprite或者MovieClip或者Bitmap）
 		 * @param type 类型 可选的值： IMAGE | ANIMATION | MOVIESHIM
+		 * @param color 对颜色区域设置变色 留空则不变色(只用于MovieShim)
 		 */
-		public function regResource(name : String,src : DisplayObject,type : String) : void
+		public function regResource(name : String,src : DisplayObject,type : String, color : int = -1) : void
 		{
 			//获取此唯一name对应的资源数据
 			var curDataStore : Object;
@@ -84,7 +90,7 @@ package org.mousebomb.bmpdisplay
 					if(src is MovieClip)
 					{
 						curDataStore["type"] = MOVIESHIM;
-						curDataStore["data"] = generateMovieShim(src as MovieClip);
+						curDataStore["data"] = generateMovieShim(src as MovieClip, color);
 					}
 					else
 					{ 
@@ -223,8 +229,9 @@ package org.mousebomb.bmpdisplay
 
 		/**
 		 * 生成MovieShim所需要的数据
+		 * @param colorValue -1表示不变色
 		 */
-		internal function generateMovieShim(src : MovieClip) : Object
+		internal function generateMovieShim(src : MovieClip,colorValue : int = -1) : Object
 		{
 			//每一帧都截成位图，最终返回_frame数组和_boundsArr数组
 			var rt : Object = {};
@@ -232,7 +239,23 @@ package org.mousebomb.bmpdisplay
 			var _boundsArr : Array = [];
 			for(var i : int = 1 ;i <= src.totalFrames;i++)
 			{
+				//每帧
 				src.gotoAndStop(i);
+				if(colorValue > -1)
+				{
+					//尝试对资源进行颜色处理
+					var colorAreaMc : DisplayObject = src.getChildByName(colorArea);
+					var colorTransform : ColorTransform = new ColorTransform();
+					colorTransform.color = colorValue;
+					if(colorAreaMc)
+					{
+						colorAreaMc.transform.colorTransform = colorTransform;
+					}
+					else
+					{
+						trace("cant get colorArea");
+					}
+				}
 				var bounds : Rectangle = src.getBounds(src);
 				var _bmd : BitmapData = new BitmapData(bounds.width, bounds.height, true, 0x00);
 				_bmd.draw(src, new Matrix(1, 0, 0, 1, -bounds.x, -bounds.y));
@@ -240,7 +263,7 @@ package org.mousebomb.bmpdisplay
 				_frame.push(_bmd);
 				_boundsArr.push(bounds);
 			}
-			rt = {_frame : _frame , _boundsArr: _boundsArr};
+			rt = {_frame : _frame, _boundsArr: _boundsArr};
 			return rt;
 		}
 	}
