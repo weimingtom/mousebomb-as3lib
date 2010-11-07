@@ -253,7 +253,7 @@ package org.mousebomb.bmpdisplay
 					}
 					else
 					{
-						trace("cant get colorArea");
+						//trace("cant get colorArea",src,colorValue.toString(16));
 					}
 				}
 				var bounds : Rectangle = src.getBounds(src);

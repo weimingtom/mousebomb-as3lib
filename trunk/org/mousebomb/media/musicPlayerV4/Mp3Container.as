@@ -37,6 +37,8 @@ package org.mousebomb.media.musicPlayerV4
 		//声音信息对象{time,comment,artist,title,album}
 		public var mp3Info : Object;
 		public var hasID3 : Boolean;
+		//原始xml
+		public var mp3Xml : XML;
 
 		public var autoPlay : Boolean = true;
 		//自动处理,默认打开,若打开则自动换歌等
@@ -83,7 +85,6 @@ package org.mousebomb.media.musicPlayerV4
 			e.target.removeEventListener(Event.COMPLETE, readListHandler);
 			e.target.removeEventListener(IOErrorEvent.IO_ERROR, ioErr);
 			var mp3ListXml : XMLList;
-			var mp3Xml : XML;
 			mp3List = [];
 			mp3Xml = XML(e.target.data);
 			mp3ListXml = XMLList(mp3Xml.sound.mp3);
@@ -364,6 +365,11 @@ package org.mousebomb.media.musicPlayerV4
 		public function get isPlaying() : Boolean
 		{
 			return flag;
+		}
+
+		public function get sound() : Sound
+		{
+			return soundFactory;
 		}
 	}
 }
