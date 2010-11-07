@@ -1,11 +1,12 @@
-package org.mousebomb.bmpdisplay 
+
+package org.mousebomb.bmpdisplay
 {
-	import flash.display.DisplayObjectContainer;
+
 	import flash.display.Bitmap;
+	import flash.display.DisplayObjectContainer;
+	import flash.display.Shape;
 	import flash.events.Event;
-	import flash.events.TimerEvent;
-	import flash.geom.Rectangle;
-	import flash.utils.Timer;
+
 
 	/**
 	 * 利用BmdObject呈现的显示对象
@@ -15,28 +16,39 @@ package org.mousebomb.bmpdisplay
 	 * @note
 	 * 需要增加重绘区域控制
 	 */
-	public class BmpDisplayObject extends Bitmap 
+	public class BmpDisplayObject extends Bitmap
 	{
+
 		use namespace bmd_render;
 		bmd_render var _bmdObject : BmdObject;
 
-		//请求渲染的次数
+		// 请求渲染的次数
 		private var _needToRender : int = 0;
 
-		//每秒渲染帧数
-		private var _fps : int = 25;
-		private var _renderTimer : Timer ;
+		//		// 每秒渲染帧数
+		// private var _fps : int = 25;
+		// private var _renderTimer : Timer ;
 
-		//事件捕捉
+		// 事件捕捉
 		private var _eventCatcher : EventCatcher;
-		//实际提供渲染功能
+		// 实际提供渲染功能
 		private var _render : RenderProcess;
-		//计算重绘范围，用于重绘
-		private var _rerenderRect : Rectangle = new Rectangle(0, 0, 0, 0);
-		//交互的监听承载者
+		//		// 计算重绘范围，用于重绘
+		// private var _rerenderRect : Rectangle = new Rectangle(0, 0, 0, 0);
+		// 交互的监听承载者
 		private var _interactiveContainer : DisplayObjectContainer;
 
-		
+		/** @private 用来做enterframe **/
+		protected static var shape : Shape;
+
+		staticInit();
+
+		private static function staticInit() : void
+		{
+			// 初始化逐帧监听
+			shape = new Shape();
+		}
+
 		/**
 		 * 
 		 * @param bmdObject	一个BmdObject，内容对象，注意：此对象不要设置x,y
@@ -48,10 +60,11 @@ package org.mousebomb.bmpdisplay
 			_bmdObject.setStage(this);
 			super(_bmdObject.bitmapData, pixelSnapping, smoothing);
 			_render = new RenderProcess(this);
-			_renderTimer = new Timer(1000 / fps);
-			_renderTimer.addEventListener(TimerEvent.TIMER, onRenderTimer);
+			// _renderTimer = new Timer(1000 / fps);
+			// _renderTimer.addEventListener(TimerEvent.TIMER, onRenderTimer);
 			_eventCatcher = new EventCatcher(this);
-			this.addEventListener(Event.ADDED_TO_STAGE, onStage);			this.addEventListener(Event.REMOVED, onLostStage);
+			this.addEventListener(Event.ADDED_TO_STAGE, onStage);
+			this.addEventListener(Event.REMOVED, onLostStage);
 		}
 
 		/**
@@ -63,13 +76,13 @@ package org.mousebomb.bmpdisplay
 			_bmdObject.setStage(this);
 		}
 
-		//从舞台移除的时候解除捕捉
+		// 从舞台移除的时候解除捕捉
 		private function onLostStage(event : Event) : void
 		{
 			_eventCatcher.clearEvents(_interactiveContainer);
 		}
 
-		//加入舞台开始捕捉
+		// 加入舞台开始捕捉
 		private function onStage(event : Event) : void
 		{
 			_eventCatcher.initEvents(_interactiveContainer);
@@ -82,24 +95,45 @@ package org.mousebomb.bmpdisplay
 		 */
 		public function startRender() : void
 		{
+			//初次渲染
 			_render.renderWhole();
-			_renderTimer.start();
+			// _renderTimer.start();
+			//逐帧监听
+			if(!shape.hasEventListener(Event.ENTER_FRAME))
+			{
+				shape.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			}
 		}
+
+//		/**
+//		 * 查看请求的个数决定是否重绘
+//		 * (这里帧的速度是取决于为我设置的fps，而不是flash的帧频)
+//		 * @see BmpDisplayObject.fps
+//		 */
+//		private function onRenderTimer(event : TimerEvent) : void
+//		{
+//			if(_needToRender)
+//			{
+//				_needToRender = 0;
+//				realRender();
+//				// trace("r");
+//				// }else{
+//				// trace("不渲染");
+//			}
+//		}
 
 		/**
 		 * 查看请求的个数决定是否重绘
-		 * (这里帧的速度是取决于为我设置的fps，而不是flash的帧频)
-		 * @see BmpDisplayObject.fps
 		 */
-		private function onRenderTimer(event : TimerEvent) : void
+		private function onEnterFrame(event : Event) : void
 		{
 			if(_needToRender)
 			{
 				_needToRender = 0;
 				realRender();
-//				trace("r");
-//			}else{
-//				trace("不渲染");
+				// trace("r");
+				// }else{
+				// trace("不渲染");
 			}
 		}
 
@@ -109,10 +143,10 @@ package org.mousebomb.bmpdisplay
 		private function realRender() : void
 		{
 			_render.renderWhole();
-//			return;
-			//等时机成熟了再完善一下 局部绘制(1)
-//			_render.renderRect(_rerenderRect);
-//			_rerenderRect.x = _rerenderRect.y = _rerenderRect.height = _rerenderRect.width = 0;
+			// return;
+			// 等时机成熟了再完善一下 局部绘制(1)
+			// _render.renderRect(_rerenderRect);
+			// _rerenderRect.x = _rerenderRect.y = _rerenderRect.height = _rerenderRect.width = 0;
 		}
 
 		/**
@@ -125,8 +159,8 @@ package org.mousebomb.bmpdisplay
 			 *  计算重绘大小
 			 *  记录计数器
 			 */
-			//_rerenderRect.追加rect 加上之前的位置、新的位置 局部绘制(2)
-			//_rerenderRect = _rerenderRect.union(whoDoesChange.renderRect).union(whoDoesChange.globalRect);
+			// _rerenderRect.追加rect 加上之前的位置、新的位置 局部绘制(2)
+			// _rerenderRect = _rerenderRect.union(whoDoesChange.renderRect).union(whoDoesChange.globalRect);
 			_needToRender++;
 		}
 
@@ -134,32 +168,33 @@ package org.mousebomb.bmpdisplay
 		{
 			//
 			_render.dispose();
-			//清除逐帧
-			_renderTimer.removeEventListener(TimerEvent.TIMER, onRenderTimer);
-			//清除位图
+			// 清除逐帧
+			shape.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+//			_renderTimer.removeEventListener(TimerEvent.TIMER, onRenderTimer);
+			// 清除位图
 			bitmapData.dispose();
 			_bmdObject = null;
 		}
 
-		/**
-		 * 每秒渲染帧数
-		 */
-		public function get fps() : int
-		{
-			return _fps;
-		}
+//		/**
+//		 * 每秒渲染帧数
+//		 */
+//		public function get fps() : int
+//		{
+//			return _fps;
+//		}
+//
+//		/**
+//		 * 每秒渲染帧数
+//		 */
+//		public function set fps(v : int) : void
+//		{
+//			if(v <= 0) return;
+//			_fps = v;
+//			_renderTimer.delay = 1000 / _fps;
+//		}
 
-		/**
-		 * 每秒渲染帧数
-		 */
-		public function set fps(v : int) : void
-		{
-			if(v <= 0) return;
-			_fps = v;
-			_renderTimer.delay = 1000 / _fps;
-		}
-
-		//  ++++ 配合事件 ++++
+		// ++++ 配合事件 ++++
 		/**
 		 * 设置了我和我父级的位置之后需要调用此方法，重新检测舞台相对位置
 		 */
@@ -168,29 +203,30 @@ package org.mousebomb.bmpdisplay
 			_eventCatcher.calcBmpOffsetPos();
 		}
 
-		//获得事件捕捉器
+		// 获得事件捕捉器
 		internal function get eventCatcher() : EventCatcher
 		{
 			return _eventCatcher;
 		}
 
-		//最近一次渲染的时间
+		// 最近一次渲染的时间
 		bmd_render function get totalTime() : int
 		{
 			return _render.totalTime;
 		}
 
-		//最近一次渲染了多少
+		// 最近一次渲染了多少
 		bmd_render function get totalObjCount() : int
 		{
 			return _render.totalObjCount;
 		}
-		
-		//交互的监听承载者
+
+		// 交互的监听承载者
 		public function get interactiveContainer() : DisplayObjectContainer
 		{
 			return _interactiveContainer;
 		}
+
 		/**
 		 * 交互的监听承载者 可以是stage，但很多情况下，不应该使用stage
 		 * 在添加到显示列表前必须设置
