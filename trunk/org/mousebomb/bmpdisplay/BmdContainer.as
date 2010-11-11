@@ -36,9 +36,10 @@ package org.mousebomb.bmpdisplay
 			 * 同时要计算global坐标
 			 */
 			_parent = parent;
-			//坐标
+			//先把需要做的处理做掉
 			if(needValidate)
 				realValidateRect();
+			//坐标
 			var pos : Point = localToGlobal();
 			var globalXAdd : Number = pos.x - _globalX;
 			var globalYAdd : Number = pos.y - _globalY;
