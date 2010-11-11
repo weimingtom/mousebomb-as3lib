@@ -57,23 +57,13 @@ package org.mousebomb.bmpdisplay
 		//全局坐标,第一次加入舞台的时候设置
 		internal var _globalY : int = 0;
 
-		/** @private 用来做enterframe **/
-		protected static var shape : Shape;
 		//需要调度的列表
 		protected static var enterFrameList : Dictionary = new Dictionary(true);
-		
-		staticInit();
-
-		private static function staticInit() : void 
-		{
-			//初始化逐帧监听
-			(shape = new Shape()).addEventListener(Event.ENTER_FRAME, onEnterFrame);
-		}
 
 		/**
 		 * 抵达一个处理周期
 		 */
-		private static function onEnterFrame(event : Event) : void 
+		bmd_render static function onEnterFrame() : void 
 		{
 			for ( var obj : * in enterFrameList)
 			{

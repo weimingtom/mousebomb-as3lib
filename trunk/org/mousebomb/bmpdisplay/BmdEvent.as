@@ -2,6 +2,8 @@ package org.mousebomb.bmpdisplay
 {
 
 	/**
+	 * 内部事件机制
+	 * 与flash的事件无关
 	 * @author Mousebomb (mousebomb@gmail.com)
 	 * @date 2010-6-23
 	 */
@@ -9,7 +11,6 @@ package org.mousebomb.bmpdisplay
 	{
 		public static const MOUSE_CLICK : String = "MOUSE_CLICK";
 		public static const MOUSE_OVER : String = "MOUSE_OVER";		public static const MOUSE_OUT : String = "MOUSE_OUT";
-		public static const RENDER : String = "RENDER";
 
 		private var _data : Object;
 		private var _type : String;
