@@ -26,7 +26,7 @@ package org.mousebomb.bmpdisplay
 		/**
 		 * 当前播放头的帧号
 		 */
-		private var _curFrame : int = 0;
+		private var _curFrame : int = -1;
 		/**
 		 * 在当前播放单元之中的帧号
 		 */
@@ -108,7 +108,9 @@ package org.mousebomb.bmpdisplay
 			{
 				this[key] = data[key];
 			}
-			showFrame(1);
+			//默认先采用第1帧，但不设置帧号，以便外部第一次调用playUnit的时候不会被(_curFrame == frame)忽视
+			_bmd = _frame[0];
+			_bounds = _boundsArr[0];
 			//记下是从池创建的
 			bmd_pool::bornFromPool = true;
 		}
@@ -126,10 +128,10 @@ package org.mousebomb.bmpdisplay
 				trace("frame's Bmd is Null : frame" + frame);
 			}
 			//DEBUG 2010年8月25日 13:20:35
-			//			if(name=="m")
-			//			{
-			//				trace(frame, _bounds);
-			//			}
+//						if(name=="a")
+//						{
+//							trace(frame, _bounds);
+//						}
 			onShowFrame(frame);
 		}
 
@@ -324,7 +326,7 @@ package org.mousebomb.bmpdisplay
 		{
 			if(_unitDefine[name_] == null)
 			{
-				trace("playUnitOnce失败，未注册的unit:", name_);
+				trace("playUnit failed : unregisted unit:", name_);
 				return;
 			}
 			//记录当前播放的单元
