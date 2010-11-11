@@ -2,12 +2,16 @@
 package org.mousebomb.bmpdisplay
 {
 
+	import org.mousebomb.utils.TimerCounter;
+
 	import flash.display.Bitmap;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Shape;
 	import flash.events.Event;
+	import flash.utils.Dictionary;
 
 
+	[Event(name="RENDER", type="org.mousebomb.bmpdisplay.BmpEvent")]
 	/**
 	 * 利用BmdObject呈现的显示对象
 	 * flash中显示用
@@ -25,7 +29,7 @@ package org.mousebomb.bmpdisplay
 		// 请求渲染的次数
 		private var _needToRender : int = 0;
 
-		//		// 每秒渲染帧数
+		//		//  每秒渲染帧数
 		// private var _fps : int = 25;
 		// private var _renderTimer : Timer ;
 
@@ -33,20 +37,20 @@ package org.mousebomb.bmpdisplay
 		private var _eventCatcher : EventCatcher;
 		// 实际提供渲染功能
 		private var _render : RenderProcess;
-		//		// 计算重绘范围，用于重绘
+		//		//  计算重绘范围，用于重绘
 		// private var _rerenderRect : Rectangle = new Rectangle(0, 0, 0, 0);
 		// 交互的监听承载者
 		private var _interactiveContainer : DisplayObjectContainer;
 
 		/** @private 用来做enterframe **/
-		protected static var shape : Shape;
+		bmd_render static var shape : Shape;
 
 		staticInit();
 
 		private static function staticInit() : void
 		{
 			// 初始化逐帧监听
-			shape = new Shape();
+			bmd_render::shape = new Shape();
 		}
 
 		/**
@@ -60,8 +64,6 @@ package org.mousebomb.bmpdisplay
 			_bmdObject.setStage(this);
 			super(_bmdObject.bitmapData, pixelSnapping, smoothing);
 			_render = new RenderProcess(this);
-			// _renderTimer = new Timer(1000 / fps);
-			// _renderTimer.addEventListener(TimerEvent.TIMER, onRenderTimer);
 			_eventCatcher = new EventCatcher(this);
 			this.addEventListener(Event.ADDED_TO_STAGE, onStage);
 			this.addEventListener(Event.REMOVED, onLostStage);
@@ -95,38 +97,43 @@ package org.mousebomb.bmpdisplay
 		 */
 		public function startRender() : void
 		{
-			//初次渲染
+			// 初次渲染
 			_render.renderWhole();
-			// _renderTimer.start();
-			//逐帧监听
+			// 逐帧监听
 			if(!shape.hasEventListener(Event.ENTER_FRAME))
 			{
 				shape.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			}
 		}
 
-//		/**
-//		 * 查看请求的个数决定是否重绘
-//		 * (这里帧的速度是取决于为我设置的fps，而不是flash的帧频)
-//		 * @see BmpDisplayObject.fps
-//		 */
-//		private function onRenderTimer(event : TimerEvent) : void
-//		{
-//			if(_needToRender)
-//			{
-//				_needToRender = 0;
-//				realRender();
-//				// trace("r");
-//				// }else{
-//				// trace("不渲染");
-//			}
-//		}
+		// /**
+		// * 查看请求的个数决定是否重绘
+		// * (这里帧的速度是取决于为我设置的fps，而不是flash的帧频)
+		// * @see BmpDisplayObject.fps
+		// */
+		// private function onRenderTimer(event : TimerEvent) : void
+		// {
+		// if(_needToRender)
+		// {
+		// _needToRender = 0;
+		// realRender();
+		//				//  trace("r");
+		//				//  }else{
+		//				//  trace("不渲染");
+		// }
+		// }
+
+		// 需要调度的列表,存储所有bmdObject
+		bmd_render static var enterFrameList : Dictionary = new Dictionary(true);
 
 		/**
 		 * 查看请求的个数决定是否重绘
 		 */
 		private function onEnterFrame(event : Event) : void
 		{
+			//渲染前的数据更新
+			BmdObject.bmd_render::onEnterFrame();
+			//处理渲染
 			if(_needToRender)
 			{
 				_needToRender = 0;
@@ -143,6 +150,7 @@ package org.mousebomb.bmpdisplay
 		private function realRender() : void
 		{
 			_render.renderWhole();
+			dispatchEvent(new BmpEvent(BmpEvent.RENDER));
 			// return;
 			// 等时机成熟了再完善一下 局部绘制(1)
 			// _render.renderRect(_rerenderRect);
@@ -170,29 +178,29 @@ package org.mousebomb.bmpdisplay
 			_render.dispose();
 			// 清除逐帧
 			shape.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
-//			_renderTimer.removeEventListener(TimerEvent.TIMER, onRenderTimer);
+			// _renderTimer.removeEventListener(TimerEvent.TIMER, onRenderTimer);
 			// 清除位图
 			bitmapData.dispose();
 			_bmdObject = null;
 		}
 
-//		/**
-//		 * 每秒渲染帧数
-//		 */
-//		public function get fps() : int
-//		{
-//			return _fps;
-//		}
-//
-//		/**
-//		 * 每秒渲染帧数
-//		 */
-//		public function set fps(v : int) : void
-//		{
-//			if(v <= 0) return;
-//			_fps = v;
-//			_renderTimer.delay = 1000 / _fps;
-//		}
+		// /**
+		// * 每秒渲染帧数
+		// */
+		// public function get fps() : int
+		// {
+		// return _fps;
+		// }
+		//
+		// /**
+		// * 每秒渲染帧数
+		// */
+		// public function set fps(v : int) : void
+		// {
+		// if(v <= 0) return;
+		// _fps = v;
+		// _renderTimer.delay = 1000 / _fps;
+		// }
 
 		// ++++ 配合事件 ++++
 		/**
@@ -234,6 +242,12 @@ package org.mousebomb.bmpdisplay
 		public function set interactiveContainer(interactiveContainer : DisplayObjectContainer) : void
 		{
 			_interactiveContainer = interactiveContainer;
+		}
+
+		// 请求渲染的次数
+		public function get needToRender() : int
+		{
+			return _needToRender;
 		}
 	}
 }
