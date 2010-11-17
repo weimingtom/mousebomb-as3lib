@@ -26,7 +26,7 @@ package org.mousebomb.bmpdisplay
 		 */
 		internal function initEvents(s : DisplayObjectContainer) : void
 		{
-			s.addEventListener(MouseEvent.CLICK, onMouseClick);
+			s.addEventListener(MouseEvent.MOUSE_UP, onMouseClick);
 			s.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			//首次计算位图本身的舞台偏移
 			calcBmpOffsetPos();
@@ -37,7 +37,7 @@ package org.mousebomb.bmpdisplay
 		 */
 		internal function clearEvents(s : DisplayObjectContainer) : void
 		{
-			s.removeEventListener(MouseEvent.CLICK, onMouseClick);			s.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+			s.removeEventListener(MouseEvent.MOUSE_UP, onMouseClick);			s.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			//置空鼠标在的对象
 			_hoverObject = null;
 		}
