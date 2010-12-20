@@ -131,9 +131,9 @@ package org.mousebomb.bmpdisplay
 		 */
 		private function onEnterFrame(event : Event) : void
 		{
-			//渲染前的数据更新
+			// 渲染前的数据更新
 			BmdObject.bmd_render::onEnterFrame();
-			//处理渲染
+			// 处理渲染
 			if(_needToRender)
 			{
 				_needToRender = 0;
@@ -172,11 +172,16 @@ package org.mousebomb.bmpdisplay
 			_needToRender++;
 		}
 
+		/**
+		 * 释放资源
+		 * 这里会释放渲染和最后渲染的位图，解除对bmdObject的引用。
+		 * 但不会调用BmdObject.dispose，以便其他地方使用，若有需要，需要手动释放BmdObject。
+		 */
 		public function dispose() : void
 		{
 			//
 			_render.dispose();
-			// 清除逐帧
+			// 清除逐帧的实例监听
 			shape.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 			// _renderTimer.removeEventListener(TimerEvent.TIMER, onRenderTimer);
 			// 清除位图
