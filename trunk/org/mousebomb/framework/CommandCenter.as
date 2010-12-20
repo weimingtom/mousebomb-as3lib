@@ -11,7 +11,7 @@ package org.mousebomb.framework
 	public class CommandCenter
 	{
 
-		protected var _allowConfig : Boolean = true;
+		protected var _needConfig : Boolean = true;
 
 		/**
 		 * 配置映射。
@@ -20,14 +20,9 @@ package org.mousebomb.framework
 		notifyHandlerClassMap[NotifyConst.PLATFORM_ROLE_CREATED] = RoleCreatedCtrler;
 		notifyHandlerClassMap[NotifyConst.PLATFORM_SERVER_CHOSEN] = ServerChosenCtrler;
 		 */
-		public function config() : void
+		protected function config() : void
 		{
-			if (_allowConfig)
-			{
-
-			}else{
-				throw new Error("已经注册控制器之后是不允许改动配置的");
-			}
+			throw new Error("CommandCenter.config是抽象方法，子类需要重写");
 		}
 		//类表
 		protected var _notifyHandlerClassMap : Object = {};
@@ -36,14 +31,18 @@ package org.mousebomb.framework
 		 * 根据配置的映射来注册
 		 * 注册之后就不允许再配置了
 		 */
-		protected function regist() : void
+		public function regist() : void
 		{
+			if (_needConfig)
+			{
+				config();
+			}
 			// 把配置项加监听
 			for (var key : String in _notifyHandlerClassMap)
 			{
 				GlobalFacade.regListener(key, notifyHandler);
 			}
-			_allowConfig = false;
+			_needConfig = false;
 		}
 		
 		/**
@@ -63,14 +62,12 @@ package org.mousebomb.framework
 		/**
 		 * 解除所有注册的映射
 		 */
-		protected function unRegist() : void
+		public function unRegist() : void
 		{
 			for (var key : String in _notifyHandlerClassMap)
 			{
 				GlobalFacade.removeListener(key, notifyHandler);
 			}
-			//
-			_allowConfig = true;
 		}
 	}
 }
