@@ -1,5 +1,6 @@
-package org.mousebomb.classLoader 
+package org.mousebomb.classLoader
 {
+	import flash.net.URLVariables;
 	import flash.display.Loader;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -11,13 +12,9 @@ package org.mousebomb.classLoader
 	import flash.system.LoaderContext;
 
 	[Exclude(name="dispatchEvent", kind="method")]
-
 	[Event(name="progress", type="flash.events.ProgressEvent")]
-
 	[Event(name="ioError", type="flash.events.IOErrorEvent")]
-
 	[Event(name="complete", type="flash.events.Event")]
-
 	/**
 	 * 运行时类库加载
 	 * 用于获得外部类，但保存在自己的子域中
@@ -25,42 +22,52 @@ package org.mousebomb.classLoader
 	 * @author Mousebomb
 	 * @date 2009-8-4
 	 */
-	public class ClassLoader extends EventDispatcher implements IClassLoader 
+	public class ClassLoader extends EventDispatcher implements IClassLoader
 	{
-		public static const LOAD_ERR : String = "加载出错";		public static const LOAD_COMPLETE : String = "加载完成"; 
-		private var _loader : Loader;  
+		public static const LOAD_ERR : String = "加载出错";
+		public static const LOAD_COMPLETE : String = "加载完成";
+		private var _loader : Loader;
 		private var _isFree : Boolean = true;
 
-		
-		public function ClassLoader( )
+		public function ClassLoader()
 		{
 			super();
 			_loader = new Loader();
-			//trace("ClassLoader");
+			// trace("ClassLoader");
+
 		}
 
 		/**
 		 * @param url 提供类定义的swf文件
 		 * @param rsl 是否为运行时共享，默认false，如果为true，则在加载完成后所有需要用的地方可直接使用类定义而不必要用getClass
+		 * @param cacheCode 破除缓存用的码
 		 */
-		public function loadFile(url : String,rsl : Boolean = false) : void
+		public function loadFile(url : String, rsl : Boolean = false, cacheCode : String = "") : void
 		{
 			var context : LoaderContext;
-			if(rsl)
+			if (rsl)
 			{
-				//子级和父级完全定义共享，但先到先得
+				// 子级和父级完全定义共享，但先到先得
+
 				context = new LoaderContext(false, ApplicationDomain.currentDomain);
 			}
 			else
 			{
-				//子级可用父级类定义，父级用子级的需要getClass
+				// 子级可用父级类定义，父级用子级的需要getClass
+
 				context = new LoaderContext(false, null);
 			}
-			_loader.load(new URLRequest(url), context);
+			var urlRequest : URLRequest = new URLRequest(url);
+			if (cacheCode)
+			{
+				urlRequest.data = new URLVariables("cacheCode=" + cacheCode);
+			}
+			_loader.load(urlRequest, context);
 			_isFree = false;
 			_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadCompH);
 			_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIoErrorH);
-			_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurityErrorH);			_loader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, onProgressH);
+			_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurityErrorH);
+			_loader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, onProgressH);
 		}
 
 		private function onProgressH(event : ProgressEvent) : void
@@ -78,14 +85,16 @@ package org.mousebomb.classLoader
 		{
 			trace("ClassLoader.onIoErrorH," + event.text);
 			dispatchEvent(event);
-			//兼容旧版
+			// 兼容旧版
+
 			dispatchEvent(new Event(LOAD_ERR));
 		}
 
 		private function onLoadCompH(event : Event) : void
 		{
 			dispatchEvent(event);
-			//兼容旧版			dispatchEvent(new Event(LOAD_COMPLETE));
+			// 兼容旧版
+			dispatchEvent(new Event(LOAD_COMPLETE));
 		}
 
 		/**

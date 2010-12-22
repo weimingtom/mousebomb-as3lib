@@ -2,6 +2,7 @@ package org.mousebomb.framework
 {
 	import org.mousebomb.global.GlobalFacade;
 	import org.mousebomb.global.Notify;
+
 	/**
 	 * 命令分派中心
 	 * 将某些Notify注册到对应的控制器
@@ -16,15 +17,16 @@ package org.mousebomb.framework
 		/**
 		 * 配置映射。
 		 * 例如
-		notifyHandlerClassMap[NotifyConst.PLATFORM_USER_LOGEDIN] = UserLogedinCtrler;
-		notifyHandlerClassMap[NotifyConst.PLATFORM_ROLE_CREATED] = RoleCreatedCtrler;
-		notifyHandlerClassMap[NotifyConst.PLATFORM_SERVER_CHOSEN] = ServerChosenCtrler;
+		_notifyHandlerClassMap[NotifyConst.PLATFORM_USER_LOGEDIN] = UserLogedinCtrler;
+		_notifyHandlerClassMap[NotifyConst.PLATFORM_ROLE_CREATED] = RoleCreatedCtrler;
+		_notifyHandlerClassMap[NotifyConst.PLATFORM_SERVER_CHOSEN] = ServerChosenCtrler;
 		 */
 		protected function config() : void
 		{
 			throw new Error("CommandCenter.config是抽象方法，子类需要重写");
 		}
-		//类表
+
+		// 类表
 		protected var _notifyHandlerClassMap : Object = {};
 
 		/**
@@ -36,25 +38,25 @@ package org.mousebomb.framework
 			if (_needConfig)
 			{
 				config();
+				_needConfig = false;
 			}
 			// 把配置项加监听
 			for (var key : String in _notifyHandlerClassMap)
 			{
 				GlobalFacade.regListener(key, notifyHandler);
 			}
-			_needConfig = false;
 		}
-		
+
 		/**
 		 * 处理通告监听
 		 * 映射到Ctrler
 		 */
 		protected function notifyHandler(n : Notify) : void
 		{
-			//根据n.name找到对应类定义
+			// 根据n.name找到对应类定义
 			var targetClass : Class = _notifyHandlerClassMap[n.name];
-			if(targetClass == null) return ;
-			//创建实例 
+			if (targetClass == null) return ;
+			// 创建实例
 			var ctrler : INotifyControler = new targetClass();
 			ctrler.exec(n);
 		}
