@@ -7,7 +7,7 @@ package org.mousebomb.classLoader
 	 */
 	public interface IClassLoader 
 	{
-		function loadFile(url:String,shared:Boolean = false):void;
+		function loadFile(url:String,shared:Boolean = false,cacheCode : String = ""):void;
 		
 		function getClass(name:String):Class;
 		
