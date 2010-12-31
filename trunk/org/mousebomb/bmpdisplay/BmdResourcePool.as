@@ -101,7 +101,7 @@ package org.mousebomb.bmpdisplay
 					if(src is Sprite)
 					{
 						curDataStore["type"] = IMAGE;
-						curDataStore["bmd"] = generateSpriteBmd(src);
+						curDataStore["data"] = generateSpriteBmd(src);
 					}else
 					if(src is Bitmap)
 					{
@@ -140,7 +140,7 @@ package org.mousebomb.bmpdisplay
 			{
 				case IMAGE:
 					rt = new Image();
-					(rt as Image).born(curDataStore["bmd"]);
+					(rt as Image).born(curDataStore["data"]);
 					break;
 				case ANIMATION:
 					rt = new Animation();

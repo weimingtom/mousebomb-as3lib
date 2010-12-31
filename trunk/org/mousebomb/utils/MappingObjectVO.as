@@ -1,7 +1,7 @@
 package org.mousebomb.utils 
 {
-	import flash.utils.getDefinitionByName;
 	import flash.utils.describeType;
+	import flash.utils.getDefinitionByName;
 
 	/**
 	 * 映射Object与VO
@@ -78,7 +78,6 @@ package org.mousebomb.utils
 						break;
 				}
 			}
-			Debug.trace4Target('rtObject: ', (rtObject));
 			//
 			return rtObject;
 		}
