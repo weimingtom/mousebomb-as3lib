@@ -30,11 +30,11 @@ package org.mousebomb.bmpdisplay
 		 * 由资源池初始化
 		 * 2010.06.21
 		 */
-		bmd_pool function born(bmd : BitmapData) : void
+		bmd_pool function born(data : Object) : void
 		{
 			//保存图像
-			this._bmd = bmd;
-			_bounds = bmd.rect;
+			this._bmd = data.bmd;
+			_bounds = data.bounds;
 			validateRectWhenResize();
 			//记下是从池创建的
 			bmd_pool::bornFromPool = true;
