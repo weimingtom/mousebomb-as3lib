@@ -90,6 +90,7 @@ package cn.flashj.multibmp
 			_bmd = _frame[0];
 			_bounds = _boundsArr[0];
 			_bmp.bitmapData = _bmd;
+			_bornFromPool = true;
 		}
 
 		// 从1开始

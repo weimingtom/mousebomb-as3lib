@@ -11,9 +11,15 @@ package cn.flashj.multibmp
 	{
 		public function MBmpContainer()
 		{
+			super();
 		}
 
 		private var _childrenList : Array = [];
+
+		// 1级子级使用的长度
+		internal var _depthChildren : int = 0;
+		// 所有子级所用的深度
+		internal var _depthAllChilren : int = 0;
 
 		public function get numChildren() : int
 		{
@@ -116,6 +122,37 @@ package cn.flashj.multibmp
 		{
 			return _childrenList[index];
 		}
+		/**
+		 * 设置子显示列表
+		 * 通常用于层级排序后的写入操作
+		 * 	(如果用setChildIndex的方法，会浪费开销在数组的splice上，所以在外面把层级排好后设置进来)
+		 * 注意：此方法直接设置子级列表 @param list 的元素应该是我的现有子级。
+		 * @param verify 是否校验list的每一项是否是子级，默认因为效率原因不做校验，这要求调用者必须保证数据完整性
+		 * （校验的消耗太大：1560个对象的排序，如果有校验耗时20ms，无校验耗时0ms）
+		 */
+		public function setChildList(list : Array , verify : Boolean = false) : void
+		{
+			if(list.length != _childrenList.length)
+			{
+				throw new Error("设置子级显示列表错误：子级数量不匹配"); 
+				return ;
+			}
+			if(verify)
+			{
+				//若需要校验，则检查每一项是否都是我现有子级 
+				for each(var child : * in list)
+				{
+					if(_childrenList.indexOf(child) == -1)
+					{
+						throw new Error("设置子显示列表校验失败:不存在的child");
+						return;
+					}
+				}
+			}
+			_childrenList = list;
+			// 层级发生变化，调用渲染
+			_bmpStage.commitDepthChange();
+		}
 
 
 		/**
@@ -123,34 +160,16 @@ package cn.flashj.multibmp
 		 */
 		public function addChild(child : MBmpObject) : void
 		{
-			if(_bmpStage == null) {throw new Error("目前仅支持一级一级加，未在舞台上的对象"+this.name+"不可作为容器使用");}
 			// 若已经存在，则忽略
 			if (_childrenList.indexOf(child) > -1)
 			{
 				return ;
 			}
-			var insertIndex : int = _childrenList.push(child) - 1;
+			 _childrenList.push(child) ;
 			// 设置父容器引用
 			child.setParent(this);
-			// 每次被addChild之后层级发生变化，调用渲染
-			// 被加入的哥们 设置层级值
-			child._depth = insertIndex;
-			child._globalDepth = this._globalDepth + child._depth + 1;
-			//
-			depthChildren += 1;
 			// 设置Bmp舞台引用
 			child.setStage(bmpStage);
-			// 影响到父级中其他内容的层级后移
-			if (parent)
-			{
-				var others : Array = parent.deeperThanMe(this);
-				for each (var bc : MBmpContainer in others)
-				{
-					bc.$validateDepthWhenChange(1);
-				}
-			}
-			// 显示更新
-			_bmpStage.addChildAt(child.bmp, child._globalDepth);
 		}
 
 		/**
@@ -171,25 +190,6 @@ package cn.flashj.multibmp
 			//
 			child.setParent(null);
 			child.setStage(null);
-			// 子级层级变化
-			var deltaDepth : int = -child._depthAllChilren - 1;
-			depthChildren += deltaDepth;
-			// 影响到的其他子级的子级
-			var bc : MBmpContainer;
-			var others : Array = deeperThanMe(child);
-			for each (bc in others)
-			{
-				bc.$validateDepthWhenChange(deltaDepth);
-			}
-			// 影响到父级的其他子级
-			if (parent)
-			{
-				others = parent.deeperThanMe(this);
-				for each (bc in others)
-				{
-					bc.$validateDepthWhenChange(-1);
-				}
-			}
 		}
 
 
@@ -210,79 +210,6 @@ package cn.flashj.multibmp
 			super.dispose();
 		}
 
-
-		/**
-		 * 获得子级中在 me 之后的容器
-		 */
-		internal function deeperThanMe(me : MBmpObject) : Array
-		{
-			var startIndex : int = me._depth + 1;
-			return _childrenList.slice(startIndex, -1);
-		}
-
-		/**
-		 * 当浅级更改时，深级内容要重算深度
-		 * @param depthAdd 层级改动值 ,正数=更深，负数=更浅
-		 */
-		internal function $validateDepthWhenChange(depthAdd : int) : void
-		{
-			// 本级深度值更新
-			_depth += depthAdd;
-			_globalDepth += depthAdd;
-			// 遍历所有子级深度值更新
-			foreachLevelChild(function(bo : MBmpObject) : void
-			{
-				bo._globalDepth += depthAdd;
-			});
-			_globalDepth += depthAdd;
-			// 显示更改
-			validateDepth();
-		}
-
-		override public function validateDepth() : void
-		{
-			super.validateDepth();
-			// 子级处理
-			// 遍历子级的_globalDepth重设
-			foreachLevelChild(function(bo : MBmpObject) : void
-			{
-				_bmpStage.setChildIndex(bo.bmp, bo._globalDepth);
-			});
-		}
-
-		/**
-		 * 一级子级使用的深度,没有children的话为0
-		 */
-		public function get depthChildren() : int
-		{
-			return _depthChildren;
-		}
-
-		/**
-		 * 设置当前层级的子级数量
-		 */
-		public function set depthChildren(v : int) : void
-		{
-			var deltaDepthChildren : int = v - _depthChildren;
-			_depthChildren = v;
-			if (parent)
-				parent.depthAllChilren += deltaDepthChildren;
-		}
-
-		// 所有子级所用的深度
-		public function get depthAllChilren() : int
-		{
-			return _depthAllChilren;
-		}
-
-		// 所有子级所用的深度
-		public function set depthAllChilren(v : int) : void
-		{
-			var delta : int = v - _depthAllChilren;
-			_depthAllChilren = v;
-			if (parent)
-				parent.depthAllChilren += delta;
-		}
 
 	}
 }

@@ -1,6 +1,7 @@
 package cn.flashj.multibmp
 {
 	import flash.display.DisplayObjectContainer;
+	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.Event;
 
@@ -13,12 +14,20 @@ package cn.flashj.multibmp
 
 		// 交互的监听承载者
 		private var _interactiveContainer : DisplayObjectContainer;
-		
-		internal var _eventCatcher:MBmpEventCatcher;
 
+		internal var _eventCatcher : MBmpEventCatcher;
+		// 深度变化计数器
+		private var _depthChange : uint;
+
+		private static var _shape : Shape;
+		staticInit();
+		private static function staticInit() : void
+		{
+			_shape = new Shape();
+		}
 
 		//
-		private var _bmdObject : MBmpObject;
+		private var _bmdObject : MBmpRoot;
 
 		public function MBmpStage(bmdObject : MBmpRoot)
 		{
@@ -29,12 +38,21 @@ package cn.flashj.multibmp
 			this.addEventListener(Event.ADDED_TO_STAGE, onStage);
 			this.addEventListener(Event.REMOVED, onLostStage);
 			_eventCatcher = new MBmpEventCatcher(this);
+			_shape.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+		}
+
+		/**
+		 * 对显示列表维护操作
+		 */
+		protected function onEnterFrame(event : Event) : void
+		{
+			validateDepth();
 		}
 
 		/**
 		 * 设置根级bmd
 		 */
-		public function setBmdObject(bmdObject : MBmpObject) : void
+		public function setBmdObject(bmdObject : MBmpRoot) : void
 		{
 			_bmdObject = bmdObject;
 			_bmdObject.setStage(this);
@@ -45,16 +63,76 @@ package cn.flashj.multibmp
 		private function onLostStage(event : Event) : void
 		{
 			// 以_interactiveContainer为对象
-			_eventCatcher.clearEvents(_interactiveContainer);
+			if (event.target == this)
+				_eventCatcher.clearEvents(_interactiveContainer);
 		}
 
 		// 加入舞台开始捕捉
 		private function onStage(event : Event) : void
 		{
 			// 以_interactiveContainer为对象
-			_eventCatcher.initEvents(_interactiveContainer);
+			if (event.target == this)
+				_eventCatcher.initEvents(_interactiveContainer);
 		}
 
+		// 1.统计效率用的 2.计算总深度
+		internal var totalObjCount : int = 0;
+
+		/**
+		 * 立即将深度重新显示
+		 */
+		internal function validateDepth() : void
+		{
+			// 根据_globalDepth
+			if (_depthChange)
+			{
+				_depthChange = 0;
+				// 开始处理
+				totalObjCount = 0;
+				var maxI : int = _bmdObject.numChildren;
+				for (var i : int = 0;i < maxI;i++)
+				{
+					// 目标显示对象
+					var child : MBmpObject = _bmdObject.getChildAt(i);
+					// 目标index
+					var index : int = ++totalObjCount;
+					if (child.globalDepth != index)
+					{
+						child._globalDepth = index;
+						this.setChildIndex(child.bmp, index);
+					}
+					validateChildrenDepth(child as MBmpContainer);
+				}
+				// trace(totalObjCount+"个对象");
+			}
+		}
+
+		/**
+		 * 对某个容器进行内部的递归
+		 */
+		private function validateChildrenDepth(container : MBmpContainer) : void
+		{
+			var maxI : int = container.numChildren;
+			for (var i : int = 0;i < maxI;i++)
+			{
+				var child : MBmpObject = container.getChildAt(i);
+				var index : int = ++totalObjCount;
+				if (child.globalDepth != index)
+				{
+					child._globalDepth = index;
+					this.setChildIndex(child.bmp, index);
+				}
+				validateChildrenDepth(child as MBmpContainer);
+			}
+		}
+
+		/**
+		 * 提交改动，将会在下一帧设置
+		 */
+		internal function commitDepthChange() : void
+		{
+			_depthChange++;
+		}
 
 		/**
 		 * 释放资源
@@ -63,6 +141,8 @@ package cn.flashj.multibmp
 		 */
 		public function dispose() : void
 		{
+			_shape.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+			_bmdObject.dispose();
 			_bmdObject = null;
 		}
 

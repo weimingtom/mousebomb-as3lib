@@ -12,8 +12,7 @@ package cn.flashj.multibmp
 		public function MBmpRoot()
 		{
 			super();
-			_globalDepth = 0;
-			_depth = 0;
+			_globalDepth = -1;
 			_depthChildren = 0;
 			_depthAllChilren = 0;
 		}
