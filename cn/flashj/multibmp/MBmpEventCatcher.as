@@ -28,6 +28,7 @@ package cn.flashj.multibmp
 		 */
 		internal function initEvents(s : DisplayObjectContainer) : void
 		{
+			trace("initEvent");
 			s.addEventListener(MouseEvent.MOUSE_UP, onMouseClick);
 			s.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		}
@@ -37,6 +38,7 @@ package cn.flashj.multibmp
 		 */
 		internal function clearEvents(s : DisplayObjectContainer) : void
 		{
+			trace("clearEvent");
 			s.removeEventListener(MouseEvent.MOUSE_UP, onMouseClick);
 			s.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			// 置空鼠标在的对象

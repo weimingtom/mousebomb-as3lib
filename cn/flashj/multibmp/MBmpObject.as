@@ -15,20 +15,13 @@ package cn.flashj.multibmp
 		protected var _x : int;
 		// 父级内的相对y
 		protected var _y : int;
-		// 父级内的相对深度 从0开始
-		internal var _depth : int;
-
-		// 1级子级使用的长度
-		internal var _depthChildren : int = 0;
-		// 所有子级所用的深度
-		internal var _depthAllChilren : int = 0;
 
 		// 舞台x (注册点所在位置)
 		internal var _globalX : int;
 		// 舞台y (注册点)
 		internal var _globalY : int;
 
-		// 舞台显示层级(我在舞台中的深度) = 父级._globalDepth + 1 + _depth;
+		// 舞台显示层级(我在舞台中的深度)
 		internal var _globalDepth : int = -1;
 
 		protected var _bmp : RefBitmap;
@@ -37,6 +30,10 @@ package cn.flashj.multibmp
 		protected var _bounds : Rectangle;
 
 		public var name : String;
+
+		internal var _isDisplay : Boolean = true;
+
+		internal var _bornFromPool : Boolean = false;
 
 
 		// 父级
@@ -101,6 +98,16 @@ package cn.flashj.multibmp
 			if (onYChange != null) onYChange(v);
 		}
 
+		public function get width() : Number
+		{
+			return _bounds.width;
+		}
+
+		public function get height() : Number
+		{
+			return _bounds.height;
+		}
+
 
 		public function get parent() : MBmpContainer
 		{
@@ -134,11 +141,12 @@ package cn.flashj.multibmp
 		 */
 		public function validateDepth() : void
 		{
-			//
-			if (_bmpStage.getChildIndex(bmp) != _globalDepth)
-			{
-				_bmpStage.setChildIndex(bmp, _globalDepth);
-			}
+			_bmpStage.commitDepthChange();
+//			//
+//			if (_bmpStage.getChildIndex(bmp) != _globalDepth)
+//			{
+//				_bmpStage.setChildIndex(bmp, _globalDepth);
+//			}
 		}
 
 		/**
@@ -198,7 +206,9 @@ package cn.flashj.multibmp
 		{
 			if (inStage)
 			{
-				_bmpStage.addChildAt(_bmp, _globalDepth);
+				// _bmpStage.addChildAt(_bmp, _globalDepth);
+				_bmpStage.addChild(_bmp);
+				_bmpStage.commitDepthChange();
 			}
 			else
 			{
@@ -226,13 +236,33 @@ package cn.flashj.multibmp
 				// 只是释放监听
 				// removeAllListener();
 			}
-//			this._bmp = null;
+			// this._bmp = null;
 		}
 
 		public function get bmp() : Bitmap
 		{
 			return _bmp;
 		}
+
+		public function get isDisplay() : Boolean
+		{
+			// TODO 如果不在画面内 应该为false
+			return _isDisplay;
+		}
+
+		public function get globalDepth() : int
+		{
+			return _globalDepth;
+		}
+
+		/**
+		 * 设置全局深度
+		 */
+		public function set globalDepth(v : int) : void
+		{
+			_globalDepth = v;
+		}
+
 
 	}
 }
