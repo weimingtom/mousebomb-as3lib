@@ -1,6 +1,5 @@
 package cn.flashj.multibmp
 {
-	import flash.geom.Rectangle;
 
 	/**
 	 * 仅作容器
@@ -12,7 +11,6 @@ package cn.flashj.multibmp
 		public function MBmpSprite()
 		{
 			super();
-			_bounds = new Rectangle(0,0,0,0);
 		}
 
 

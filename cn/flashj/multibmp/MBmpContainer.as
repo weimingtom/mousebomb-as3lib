@@ -1,93 +1,43 @@
 package cn.flashj.multibmp
 {
 
-	import flash.geom.Point;
+	import flash.display.DisplayObject;
+	import flash.display.Sprite;
+	import flash.events.Event;
 
 	/**
+	 * 树枝级显示容器
 	 * @author Mousebomb (mousebomb@gmail.com)
 	 * @date 2011-1-5
 	 */
-	public class MBmpContainer extends MBmpEventDispatcher
+	public class MBmpContainer extends MBmpObject
 	{
 		public function MBmpContainer()
 		{
 			super();
+			_sprite = new Sprite();
+			_sprite.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
+
+		private function onEnterFrame(event : Event) : void
+		{
+			validateDepth();
+		}
+
+		// 真容器
+		private var _sprite : Sprite;
 
 		private var _childrenList : Array = [];
 
-		// 1级子级使用的长度
-		internal var _depthChildren : int = 0;
-		// 所有子级所用的深度
-		internal var _depthAllChilren : int = 0;
+
+		override public function get displayObject() : DisplayObject
+		{
+			return _sprite;
+		}
 
 		public function get numChildren() : int
 		{
 			return _childrenList.length;
-		}
-
-		/**
-		 * 设置父级（或更换父级）\
-		 * 此时即ADDED
-		 */
-		override internal function setParent(parent : MBmpContainer) : void
-		{
-			/*
-			 * 设置父级引用，
-			 * 同时要计算global坐标
-			 */
-			_parent = parent;
-			// 坐标
-			var pos : Point = localToGlobal();
-			var globalXAdd : Number = pos.x - _globalX;
-			var globalYAdd : Number = pos.y - _globalY;
-			_globalX = pos.x;
-			_globalY = pos.y;
-			// 让子级坐标全局换算
-			foreachLevelChild(function(bo : MBmpObject) : void
-			{
-				bo._globalX += globalXAdd;
-				bo._globalY += globalYAdd;
-			});
-			validatePos();
-		}
-
-		override public function validatePos() : void
-		{
-			super.validatePos();
-			// 层级
-			for (var i : int = numChildren - 1;i >= 0;--i)
-			{
-				var child : MBmpObject = getChildAt(i);
-				child.validatePos();
-			}
-		}
-
-		/**
-		 * 设置舞台引用
-		 * 此时即ADD_TO_STAGE
-		 */
-		internal override function setStage(v : MBmpStage) : void
-		{
-			super.setStage(v);
-			// 这里要加入对自己和子级的维护
-			for (var i : int = numChildren - 1;i >= 0;--i)
-			{
-				var child : MBmpObject = getChildAt(i);
-				child.setStage(v);
-			}
-		}
-
-		internal override function  $validateRectWhenMove(xAdd : int, yAdd : int) : void
-		{
-			super.$validateRectWhenMove(xAdd, yAdd);
-			// 联合体无需检查子级
-			// 对子级调用 遍历检测
-			for (var i : int = numChildren - 1;i >= 0;--i)
-			{
-				var child : MBmpObject = getChildAt(i);
-				child.$validateRectWhenMove(xAdd, yAdd);
-			}
 		}
 
 		/**
@@ -111,6 +61,8 @@ package cn.flashj.multibmp
 			var oldindex : int = _childrenList.indexOf(child);
 			_childrenList.splice(oldindex, 1);
 			_childrenList.splice(index, 0, child);
+			//
+			commitDepthChange();
 		}
 
 		public function getChildIndex(child : MBmpObject) : int
@@ -122,6 +74,7 @@ package cn.flashj.multibmp
 		{
 			return _childrenList[index];
 		}
+
 		/**
 		 * 设置子显示列表
 		 * 通常用于层级排序后的写入操作
@@ -130,19 +83,19 @@ package cn.flashj.multibmp
 		 * @param verify 是否校验list的每一项是否是子级，默认因为效率原因不做校验，这要求调用者必须保证数据完整性
 		 * （校验的消耗太大：1560个对象的排序，如果有校验耗时20ms，无校验耗时0ms）
 		 */
-		public function setChildList(list : Array , verify : Boolean = false) : void
+		public function setChildList(list : Array, verify : Boolean = false) : void
 		{
-			if(list.length != _childrenList.length)
+			if (list.length != _childrenList.length)
 			{
-				throw new Error("设置子级显示列表错误：子级数量不匹配"); 
+				throw new Error("设置子级显示列表错误：子级数量不匹配");
 				return ;
 			}
-			if(verify)
+			if (verify)
 			{
-				//若需要校验，则检查每一项是否都是我现有子级 
-				for each(var child : * in list)
+				// 若需要校验，则检查每一项是否都是我现有子级
+				for each (var child : * in list)
 				{
-					if(_childrenList.indexOf(child) == -1)
+					if (_childrenList.indexOf(child) == -1)
 					{
 						throw new Error("设置子显示列表校验失败:不存在的child");
 						return;
@@ -150,13 +103,46 @@ package cn.flashj.multibmp
 				}
 			}
 			_childrenList = list;
-			// 层级发生变化，调用渲染
-			_bmpStage.commitDepthChange();
+			commitDepthChange();
+		}
+
+		// 深度变化计数器
+		private var _depthChange : uint;
+
+		/**
+		 * 提交改动，将会在下一帧设置
+		 */
+		internal function commitDepthChange() : void
+		{
+			_depthChange++;
+		}
+
+		public function validateDepth() : void
+		{
+			if (_depthChange)
+			{
+				_depthChange = 0;
+				// 开始处理
+				var maxI : int = this.numChildren;
+				// 要处理成 顺序等于arr里的样子
+				for (var i : int = 0;i < maxI;i++)
+				{
+					// 目标显示对象
+					var child : MBmpObject = this.getChildAt(i);
+					if (child.depth != i)
+					{
+						// 实际操作
+						child.depth = i;
+						_sprite.setChildIndex(child.displayObject, i);
+					}
+				}
+				// trace(totalObjCount + "个对象");
+			}
 		}
 
 
 		/**
-		 * 加的时候目前只支持一级一级加
+		 * 加子级
 		 */
 		public function addChild(child : MBmpObject) : void
 		{
@@ -165,11 +151,11 @@ package cn.flashj.multibmp
 			{
 				return ;
 			}
-			 _childrenList.push(child) ;
+			_childrenList.push(child) ;
 			// 设置父容器引用
 			child.setParent(this);
-			// 设置Bmp舞台引用
-			child.setStage(bmpStage);
+			_sprite.addChild(child.displayObject);
+			child.validatePos();
 		}
 
 		/**
@@ -178,8 +164,6 @@ package cn.flashj.multibmp
 		 */
 		public function removeChild(child : MBmpObject) : void
 		{
-			// 从舞台移除会同时移除监听
-			// child.removeAllListener();
 			var index : int = _childrenList.indexOf(child);
 			if (index == -1)
 			{
@@ -189,9 +173,9 @@ package cn.flashj.multibmp
 			_childrenList.splice(index, 1);
 			//
 			child.setParent(null);
-			child.setStage(null);
+			//
+			_sprite.removeChild(child.displayObject);
 		}
-
 
 		/**
 		 * 释放资源;
@@ -206,6 +190,8 @@ package cn.flashj.multibmp
 				var child : MBmpObject = getChildAt(i);
 				child.dispose();
 			}
+			//
+			_sprite.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 			// super
 			super.dispose();
 		}
