@@ -1,4 +1,4 @@
-package org.mousebomb.Math 
+package org.mousebomb.Math
 {
 	import flash.geom.Point;
 
@@ -6,12 +6,12 @@ package org.mousebomb.Math
 	 * @author Mousebomb
 	 * @since 2009-1-1
 	 */
-	public class MousebombMath 
+	public class MousebombMath
 	{
 		/**
 		 * 获得一个十进制数第pow位的值 (个位的pow=0)
-		 */		
-		public static function getDigit(num : Number,pow : int) : int
+		 */
+		public static function getDigit(num : Number, pow : int) : int
 		{
 			return (Math.floor(num % (Math.pow(10, pow + 1)) / Math.pow(10, pow)));
 		}
@@ -20,10 +20,10 @@ package org.mousebomb.Math
 		 * 范围随机数
 		 * @return 大于或等于min且小于max的数值
 		 */
-		public static function randomFromRange(min : Number,max : Number) : Number
+		public static function randomFromRange(min : Number, max : Number) : Number
 		{
 			return Math.random() * (max - min) + min;
-		} 
+		}
 
 		/**
 		 * 弧度转角度
@@ -40,15 +40,16 @@ package org.mousebomb.Math
 		{
 			return degrees * Math.PI / 180;
 		}
-		
+
 		/**
 		 * 2d空间两点间的距离
 		 */
-		public static function distanceOf2Point(fromPoint:Point,toPoint:Point):Number
+		public static function distanceOf2Point(fromPoint : Point, toPoint : Point) : Number
 		{
-			var deltaX: Number= toPoint.x - fromPoint.x;
+			var deltaX : Number = toPoint.x - fromPoint.x;
 			var deltaY : Number = toPoint.y - fromPoint.y;
 			return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 		}
+
 	}
 }

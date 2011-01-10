@@ -83,6 +83,7 @@ package cn.flashj.multibmp
 		 */
 		internal function validateDepth() : void
 		{
+//			TimerCounter.startTask("validateDepth");
 			// 根据_globalDepth
 			if (_depthChange)
 			{
@@ -103,7 +104,8 @@ package cn.flashj.multibmp
 					}
 					validateChildrenDepth(child as MBmpContainer);
 				}
-				// trace(totalObjCount+"个对象");
+//				trace(totalObjCount + "个对象");
+//				TimerCounter.endTask("validateDepth");
 			}
 		}
 
@@ -159,6 +161,14 @@ package cn.flashj.multibmp
 		public function set interactiveContainer(v : DisplayObjectContainer) : void
 		{
 			_interactiveContainer = v;
+		}
+
+		/**
+		 * 用于监听onEnterFrame的
+		 */
+		public function get shape() : Shape
+		{
+			return _shape;
 		}
 	}
 }
