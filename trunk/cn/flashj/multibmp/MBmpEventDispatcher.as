@@ -67,5 +67,14 @@ package cn.flashj.multibmp
 
 
 
+		override public function dispose() : void
+		{
+			// 只是释放监听
+			removeAllListener();
+			super.dispose();
+
+		}
+
+
 	}
 }

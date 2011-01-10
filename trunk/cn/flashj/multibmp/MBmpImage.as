@@ -6,7 +6,7 @@ package cn.flashj.multibmp
 	 * @author Mousebomb (mousebomb@gmail.com)
 	 * @date 2011-1-6
 	 */
-	public class MBmpImage extends MBmpContainer
+	public class MBmpImage extends MBmpLeaf
 	{
 		public function MBmpImage()
 		{

@@ -9,7 +9,7 @@ package cn.flashj.multibmp
 	 * @author Mousebomb (mousebomb@gmail.com)
 	 * @date 2011-1-5
 	 */
-	public class MBmpMovieShim extends MBmpContainer
+	public class MBmpMovieShim extends MBmpLeaf
 	{
 		/**
 		 * 帧号对应bmd表
@@ -274,6 +274,7 @@ package cn.flashj.multibmp
 
 		override public function dispose() : void
 		{
+			//MovieShim目前只允许从pool创建，所以析构中不释放位图
 			//停止播放
 			stop();
 			//清除回调和监听
