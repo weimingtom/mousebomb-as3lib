@@ -1,5 +1,6 @@
 package org.mousebomb.framework
 {
+	import org.mousebomb.events.DConfigEvent;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
@@ -9,9 +10,9 @@ package org.mousebomb.framework
 	import flash.net.URLVariables;
 
 	// 单个XML加载渐进
-	[Event(name="progress", type="flash.events.ProgressEvent")]
+	[Event(name="progress", type="flash.events.ProgressEvent")]	[Event(name="CONFIG_PROGRESS", type="org.mousebomb.events.DConfigEvent")]
 	// 所有XML加载完成
-	[Event(name="complete", type="flash.events.Event")]
+	[Event(name="complete", type="flash.events.Event")]	[Event(name="CONFIG_LOADCOMPLETE", type="org.mousebomb.events.DConfigEvent")]
 	public class DConfigProxy extends EventDispatcher
 	{
 		private var _loader : URLLoader;
@@ -77,8 +78,9 @@ package org.mousebomb.framework
 		// 这里放出的是单个config的加载任务，不是所有
 		private function onProgress(event : ProgressEvent) : void
 		{
-			// var p : Number = (event.bytesLoaded / event.bytesTotal);
+			 var p : Number = (event.bytesLoaded / event.bytesTotal);
 			dispatchEvent(event);
+			dispatchEvent(new DConfigEvent(DConfigEvent.CONFIG_PROGRESS,p));
 		}
 
 		// 一次加载完成
@@ -98,6 +100,7 @@ package org.mousebomb.framework
 				// 若全部加载完成
 				parseConfig();
 				dispatchEvent(event);
+				dispatchEvent(new DConfigEvent(DConfigEvent.CONFIG_LOADCOMPLETE));
 			}
 		}
 
