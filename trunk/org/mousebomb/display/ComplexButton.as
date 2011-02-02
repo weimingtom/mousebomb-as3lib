@@ -29,6 +29,11 @@ package org.mousebomb.display
 		
 		public function ComplexButton():void
 		{
+			init();
+		}
+
+		protected function init() : void
+		{
 			this.addEventListener(Event.ADDED_TO_STAGE,add2Stage);
 			this.addEventListener(MouseEvent.ROLL_OVER,rollOverH);
 			this.addEventListener(MouseEvent.ROLL_OUT,rollOutH);
