@@ -61,12 +61,10 @@ package org.mousebomb.display
 		}
 		private function pressH(e:MouseEvent):void
 		{
-			trace("down");
 			this.press();
 		}
 		private function releaseH(e:MouseEvent):void
 		{
-			trace("release");
 			this.release();
 		}
 		private function normalH(e:MouseEvent):void
