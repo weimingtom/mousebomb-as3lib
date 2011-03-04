@@ -10,7 +10,7 @@
     import flash.filters.DropShadowFilter;
 	import flash.utils.Timer;
 	
-	public class Tooltip extends Sprite {
+	public class Tooltip extends Sprite implements IToolTip {
 		
 		var tipString:TextField;
 		var board:Shape;

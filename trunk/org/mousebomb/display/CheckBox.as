@@ -1,11 +1,17 @@
-﻿package org.mousebomb.display {
+﻿package org.mousebomb.display
+{
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
+	import flash.display.SimpleButton;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.display.SimpleButton;
-	import org.mousebomb.events.MousebombEvent;
 
+/**
+ * 
+ * 复选框
+ * 使用说明：
+ * 显示对象继承自我
+ */
 	public class CheckBox extends MovieClip 
 	{
 		public var right:DisplayObject;
