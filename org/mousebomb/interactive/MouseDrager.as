@@ -9,7 +9,7 @@
 	import flash.geom.Rectangle;
 
 	/**
-	 * ...
+	 * 鼠标拖拽功能
 	 * @author Mousebomb@qoolu
 	 */
 	public class MouseDrager extends EventDispatcher implements IDispose
