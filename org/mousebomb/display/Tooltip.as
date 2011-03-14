@@ -12,11 +12,11 @@
 	
 	public class Tooltip extends Sprite implements IToolTip {
 		
-		var tipString:TextField;
-		var board:Shape;
-		var boardShadow:Shape;
-		var timer:Timer;
-		var filter:BitmapFilter;
+		internal var tipString:TextField;
+		internal var board:Shape;
+		internal var boardShadow:Shape;
+		internal var timer:Timer;
+		internal var filter:BitmapFilter;
 		
 		public function Tooltip():void{
 			init();
