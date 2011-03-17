@@ -1,5 +1,6 @@
 package org.mousebomb.interactive
 {
+	import flash.events.Event;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
@@ -37,6 +38,12 @@ package org.mousebomb.interactive
 			_panel = panel;
 			_dragger = new MouseDrager(panel);
 			_dragHandler.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+			_dragHandler.addEventListener(Event.REMOVED, onRemove);
+		}
+
+		private function onRemove(event : Event) : void
+		{
+			_dragger.stopDrag();
 		}
 
 		private function onMouseDown(event : MouseEvent) : void
@@ -50,7 +57,6 @@ package org.mousebomb.interactive
 			_dragger.stopDrag();
 			_dragHandler.stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 		}
-
 
 	}
 }
