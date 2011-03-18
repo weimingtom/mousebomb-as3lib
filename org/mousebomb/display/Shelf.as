@@ -20,12 +20,12 @@ package org.mousebomb.display
 		// 数据 arrayOrVector
 		private var _voArray : *;
 
-		public var marginX : Number;
-		public var marginY : Number;
+		public var marginX : Number = 20.0;
+		public var marginY : Number = 20.0;
 		// 每页显示多少条
-		public var pageCount : int;
+		public var pageCount : int = 9;
 		// 多少列
-		public var cols : int;
+		public var cols : int = 3;
 		public var liClass : Class;
 
 		public var onLiClick : Function;
