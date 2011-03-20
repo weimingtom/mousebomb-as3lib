@@ -23,6 +23,7 @@ package org.mousebomb.framework
 	{
 		// rsl键值对
 		private var rslMap : Object = {};
+		private var rslIndex : Array = [];
 		// 加载队列，加载完成后就为[]
 		private var loadingQueue : Array = [];
 		// 总lib数量
@@ -112,10 +113,12 @@ package org.mousebomb.framework
 			{
 				var xnode : XML = list[i];
 				rslMap[xnode.@key] = {name:xnode.@name.toString(), loader:new ClassLoader(), url:xnode.@url.toString()};
+				rslIndex.push(xnode.@key);
 			}
-			// 创建加载队列，初始化加载
-			for each (var rslItem : Object  in rslMap)
+			//创建加载队列，初始化加载
+			for each (var rslKey : String in rslIndex)
 			{
+				var rslItem : Object = rslMap[rslKey];
 				// 加入加载队列
 				loadingQueue.push(rslItem);
 				// 监听完成事件
@@ -130,7 +133,7 @@ package org.mousebomb.framework
 			var rslItem : Object = loadingQueue.shift();
 			if (rslItem)
 			{
-				// trace("加载", rslItem['name'], rslItem['url']);
+//				 trace("加载", rslItem['name'], rslItem['url']);
 				// 传出加载的内容
 				var e : RSLEvent = new RSLEvent(RSLEvent.RSL_NEXT, rslItem['name']);
 				dispatchEvent(e);
