@@ -47,7 +47,7 @@ package org.mousebomb.display
 		}
 
 
-		public function addLi(vo : *) : void
+		public function addLi(vo : *) : *
 		{
 			var li : * = new liClass();
 			li.liData = vo;
@@ -55,6 +55,7 @@ package org.mousebomb.display
 			li.x = (numChildren % cols) * marginX;
 			li.y = int(numChildren / cols) * marginY;
 			addChild(li);
+			return li;
 		}
 
 		public function cls() : void
