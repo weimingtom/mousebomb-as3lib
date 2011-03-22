@@ -84,5 +84,10 @@ package org.mousebomb.ui
 			graphics.drawRect(0, 0, super.width, super.height);
 			graphics.endFill();
 		}
+		
+		public function validate():void
+		{
+			validateSize();			validateBg();
+		}
 	}
 }
