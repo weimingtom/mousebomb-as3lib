@@ -40,7 +40,7 @@ package org.mousebomb.ui
 		{
 			_scrollV = v;
 			scrollRect = new Rectangle(0, v - 1, _scrollWidth, _scrollHeight);
-//			trace('set scrollV ,scrollRect: ' + (scrollRect));
+			trace('set scrollV ,scrollRect: ' + (scrollRect));
 		}
 		
 		/**
