@@ -11,6 +11,8 @@ package org.mousebomb.ui
 	 */
 	public class ScrollContainer extends Sprite implements IScrollContainer
 	{
+		//未实现
+		private var _scrollWidth : Number;
 		private var _scrollHeight : Number;
 		private var _scrollV : Number;
 		private var _maxScrollV : Number;
@@ -37,7 +39,20 @@ package org.mousebomb.ui
 		public function set scrollV(v : Number) : void
 		{
 			_scrollV = v;
-			scrollRect = new Rectangle(0, v - 1, _content.width, _scrollHeight);
+			scrollRect = new Rectangle(0, v - 1, _scrollWidth, _scrollHeight);
+//			trace('set scrollV ,scrollRect: ' + (scrollRect));
+		}
+		
+		/**
+		 * 设置显示大小
+		 */
+		public function setSize(w : Number, h : Number):void
+		{
+			_scrollWidth = w;
+			_scrollHeight = h;
+			scrollRect = new Rectangle(0, 0, _scrollWidth, _scrollHeight);
+			_scrollV = 0.0;
+			validateMaxScroll();
 		}
 
 		// 高度
@@ -55,9 +70,25 @@ package org.mousebomb.ui
 		override public function set height(value : Number) : void
 		{
 			_scrollHeight = value;
-			scrollRect = new Rectangle(0, 0, _content.width, _scrollHeight);
+			scrollRect = new Rectangle(0, 0, _scrollWidth, _scrollHeight);
+//			trace('set height,scrollRect: ' + (scrollRect));
 			_scrollV = 0.0;
-			validateSize();
+			validateMaxScroll();
+		}
+
+		// 宽度
+		override public function get width() : Number
+		{
+			return _scrollWidth;
+		}
+
+		override public function set width(value : Number) : void
+		{
+			_scrollWidth = value;
+			scrollRect = new Rectangle(0, 0, _scrollWidth, _scrollHeight);
+//			trace('set width,scrollRect: ' + (scrollRect));
+			_scrollV = 0.0;
+			validateMaxScroll();
 		}
 
 		// 背景
@@ -70,7 +101,7 @@ package org.mousebomb.ui
 		/**
 		 * 大小更新
 		 */
-		public function validateSize() : void
+		public function validateMaxScroll() : void
 		{
 			if (_content)
 			{
@@ -91,14 +122,14 @@ package org.mousebomb.ui
 			if (_content)
 			{
 				graphics.beginBitmapFill(_bg);
-				graphics.drawRect(0, 0, _content.width, _content.height);
+				graphics.drawRect(0, 0, _scrollWidth, _content.height);
 				graphics.endFill();
 			}
 		}
 
 		public function validate() : void
 		{
-			validateSize();
+			validateMaxScroll();
 			validateBg();
 		}
 
