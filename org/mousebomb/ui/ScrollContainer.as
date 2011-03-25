@@ -1,7 +1,7 @@
 package org.mousebomb.ui
 {
+	import flash.display.DisplayObject;
 	import flash.display.BitmapData;
-	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.geom.Rectangle;
 
@@ -15,6 +15,7 @@ package org.mousebomb.ui
 		private var _scrollV : Number;
 		private var _maxScrollV : Number;
 		private var _bg : BitmapData;
+		private var _content : DisplayObject;
 
 		public function ScrollContainer()
 		{
@@ -36,7 +37,8 @@ package org.mousebomb.ui
 		public function set scrollV(v : Number) : void
 		{
 			_scrollV = v;
-			scrollRect = new Rectangle(0, v - 1, width, _scrollHeight);
+			scrollRect = new Rectangle(0, v - 1, _content.width, _scrollHeight);
+			trace('set scrollV ,scrollRect: ' + (scrollRect));
 		}
 
 		// 高度
@@ -54,7 +56,8 @@ package org.mousebomb.ui
 		override public function set height(value : Number) : void
 		{
 			_scrollHeight = value;
-			scrollRect = new Rectangle(0, 0, width, _scrollHeight);
+			scrollRect = new Rectangle(0, 0, _content.width, _scrollHeight);
+			trace('set height ,scrollRect: ' + (scrollRect));
 			_scrollV = 0.0;
 			validateSize();
 		}
@@ -71,7 +74,15 @@ package org.mousebomb.ui
 		 */
 		public function validateSize() : void
 		{
-			_maxScrollV = 1 + super.height - _scrollHeight;
+			if (_content)
+			{
+				_maxScrollV = 1 + _content.height - _scrollHeight;
+			}
+			else
+			{
+				_maxScrollV = 1;
+			}
+				trace('validateSize,_maxScrollV: ' + (_maxScrollV));
 		}
 
 		/**
@@ -80,14 +91,36 @@ package org.mousebomb.ui
 		public function validateBg() : void
 		{
 			graphics.clear();
-			graphics.beginBitmapFill(_bg);
-			graphics.drawRect(0, 0, super.width, super.height);
-			graphics.endFill();
+			if (_content)
+			{
+				graphics.beginBitmapFill(_bg);
+				graphics.drawRect(0, 0, _content.width, _content.height);
+				graphics.endFill();
+			}
 		}
-		
-		public function validate():void
+
+		public function validate() : void
 		{
-			validateSize();			validateBg();
+			validateSize();
+			validateBg();
+		}
+
+		/**
+		 * 实际显示内容
+		 */
+		public function get content() : DisplayObject
+		{
+			return _content;
+		}
+
+		public function set content(content : DisplayObject) : void
+		{
+			_content = content;
+			for (var i : int = numChildren - 1 ; i >= 0 ;--i)
+			{
+				removeChildAt(i);
+			}
+			addChild(_content);
 		}
 	}
 }
