@@ -38,7 +38,6 @@ package org.mousebomb.ui
 		{
 			_scrollV = v;
 			scrollRect = new Rectangle(0, v - 1, _content.width, _scrollHeight);
-			trace('set scrollV ,scrollRect: ' + (scrollRect));
 		}
 
 		// 高度
@@ -57,7 +56,6 @@ package org.mousebomb.ui
 		{
 			_scrollHeight = value;
 			scrollRect = new Rectangle(0, 0, _content.width, _scrollHeight);
-			trace('set height ,scrollRect: ' + (scrollRect));
 			_scrollV = 0.0;
 			validateSize();
 		}
@@ -82,7 +80,6 @@ package org.mousebomb.ui
 			{
 				_maxScrollV = 1;
 			}
-				trace('validateSize,_maxScrollV: ' + (_maxScrollV));
 		}
 
 		/**
