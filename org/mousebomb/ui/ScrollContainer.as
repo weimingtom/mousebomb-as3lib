@@ -119,7 +119,7 @@ package org.mousebomb.ui
 		public function validateBg() : void
 		{
 			graphics.clear();
-			if (_content)
+			if (_content && _bg)
 			{
 				graphics.beginBitmapFill(_bg);
 				graphics.drawRect(0, 0, _scrollWidth, _content.height);
