@@ -81,5 +81,22 @@ package org.mousebomb.utils
 			//
 			return rtObject;
 		}
+		
+		/**
+		 * 转化一个Object为一个有类声明的值对象
+		 * 不支持嵌套
+		 * @param className 目标类
+		 * @param dataSrc 数据源
+		 */
+		public function simpleObject(className : Class , dataSrc : Object):*
+		{
+			//返回对象
+			var rtObject : * = new className();
+			for (var key : String in dataSrc)
+			{
+				rtObject[key] = dataSrc[key];
+			}
+			return rtObject;
+		}
 	}
 }
