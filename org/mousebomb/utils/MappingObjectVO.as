@@ -71,7 +71,7 @@ package org.mousebomb.utils
 						try
 						{
 							rtObject[vKey] = doRequest(getDefinitionByName(vType) as Class, dataSrc[vKey]);
-						}catch(e)
+						}catch(e:*)
 						{
 							trace("类型:" + vType + "在运行时不存在");
 						}
